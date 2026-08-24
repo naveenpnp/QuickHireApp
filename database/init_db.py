@@ -4,8 +4,22 @@ import sys
 
 # Ensure database directory is in path
 DB_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(DB_DIR, 'quickhire.db')
 SCHEMA_PATH = os.path.join(DB_DIR, 'schema.sql')
+
+def get_db_path():
+    if os.environ.get('VERCEL') == '1' or (os.path.exists(DB_DIR) and not os.access(DB_DIR, os.W_OK)):
+        tmp_db = '/tmp/quickhire.db'
+        orig_db = os.path.join(DB_DIR, 'quickhire.db')
+        if not os.path.exists(tmp_db) and os.path.exists(orig_db):
+            import shutil
+            try:
+                shutil.copy2(orig_db, tmp_db)
+            except Exception:
+                pass
+        return tmp_db
+    return os.path.join(DB_DIR, 'quickhire.db')
+
+DB_PATH = get_db_path()
 
 if DB_DIR not in sys.path:
     sys.path.insert(0, DB_DIR)
@@ -13,13 +27,14 @@ if DB_DIR not in sys.path:
 from seed import seed_database
 
 def init_db(force=False):
-    if force and os.path.exists(DB_PATH):
+    db_file = get_db_path()
+    if force and os.path.exists(db_file):
         try:
-            os.remove(DB_PATH)
+            os.remove(db_file)
         except Exception:
             pass
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
     # Check if tables already exist

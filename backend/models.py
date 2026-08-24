@@ -2,12 +2,30 @@ import sqlite3
 import os
 from contextlib import contextmanager
 
-# Path to database relative to this file
+# Path to database (handles Vercel /tmp writable directory)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.abspath(os.path.join(BASE_DIR, '..', 'database', 'quickhire.db'))
+PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
+DATABASE_DIR = os.path.join(PROJECT_ROOT, 'database')
+
+def get_db_path():
+    # If running on Vercel or read-only lambda container, use writable /tmp
+    if os.environ.get('VERCEL') == '1' or not os.access(DATABASE_DIR, os.W_OK) if os.path.exists(DATABASE_DIR) else True:
+        tmp_db = '/tmp/quickhire.db'
+        orig_db = os.path.join(DATABASE_DIR, 'quickhire.db')
+        if not os.path.exists(tmp_db) and os.path.exists(orig_db):
+            import shutil
+            try:
+                shutil.copy2(orig_db, tmp_db)
+            except Exception:
+                pass
+        return tmp_db
+    return os.path.join(DATABASE_DIR, 'quickhire.db')
+
+DB_PATH = get_db_path()
 
 def get_db_connection():
-    conn = sqlite3.connect(DB_PATH)
+    db_file = get_db_path()
+    conn = sqlite3.connect(db_file)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
