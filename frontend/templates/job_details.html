@@ -1,0 +1,610 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} — QuickHire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb & Back button -->
+  <div class="mb-3">
+    <a href="{{ url_for('job_routes.jobs') }}" class="text-decoration-none text-muted small">
+      <i class="bi bi-arrow-left me-1"></i> Back to Jobs
+    </a>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Left Column: Job Details & Action Controls -->
+    <div class="col-lg-8">
+      <div class="card card-custom p-4 mb-4 shadow-sm">
+        
+        <!-- Header & Badges -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fs-6">
+              {{ job.category }}
+            </span>
+            {% if job.urgent %}
+              <span class="badge badge-urgent fs-6">🔴 URGENT JOB</span>
+            {% endif %}
+          </div>
+          <span class="badge bg-dark px-3 py-2 fs-6">{{ job.status }}</span>
+        </div>
+
+        <h2 class="fw-extrabold mb-3">{{ job.title }}</h2>
+
+        <!-- Key Meta Grid -->
+        <div class="row g-3 p-3 bg-light rounded-3 mb-4">
+          <div class="col-6 col-md-3">
+            <span class="text-muted small d-block">Location</span>
+            <strong class="text-dark"><i class="bi bi-geo-alt text-danger me-1"></i>{{ job.location }}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <span class="text-muted small d-block">Date</span>
+            <strong class="text-dark"><i class="bi bi-calendar-event text-primary me-1"></i>{{ job.job_date }}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <span class="text-muted small d-block">Time</span>
+            <strong class="text-dark"><i class="bi bi-clock text-info me-1"></i>{{ job.start_time }} - {{ job.end_time }}</strong>
+          </div>
+          <div class="col-6 col-md-3">
+            <span class="text-muted small d-block">Payment per Worker</span>
+            <strong class="fs-5 text-success">₹{{ "%.0f"|format(job.payment) }}</strong>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-4">
+          <h5 class="fw-bold mb-2">Job Description</h5>
+          <p class="text-secondary leading-relaxed" style="white-space: pre-line;">{{ job.description }}</p>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between pt-3 border-top text-muted small">
+          <div><i class="bi bi-people me-1"></i>{{ job.required_workers }} Worker(s) Needed &bull; {{ job.assigned_count }} Selected</div>
+          <div>Posted on {{ job.created_at }}</div>
+        </div>
+      </div>
+
+      <!-- WORKER INTERACTION PANEL (If current user is worker or looking to apply) -->
+      {% if not is_poster %}
+        <div class="card card-custom p-4 mb-4 shadow-sm border-primary-subtle">
+          <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-person-workspace text-primary"></i> Worker Action Panel
+          </h5>
+
+          {% if not current_user %}
+            <div class="alert alert-info d-flex align-items-center justify-content-between m-0">
+              <div>Please log in to apply for this job and start earning.</div>
+              <a href="{{ url_for('auth_routes.login', role='worker') }}" class="btn btn-success btn-sm fw-bold">Worker Login</a>
+            </div>
+          {% elif user_assignment %}
+            <!-- Worker is Assigned to this job! -->
+            <div class="p-3 bg-light rounded-3 mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold">Your Assignment Status:</span>
+                <span class="badge {% if user_assignment.status == 'Completed' %}bg-success{% elif user_assignment.status == 'In Progress' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %} px-3 py-2">
+                  {{ user_assignment.status }}
+                </span>
+              </div>
+
+              {% if user_assignment.status == 'Assigned' %}
+                <div class="card p-3 mb-3 bg-light border-0 rounded-3">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Scheduled Shift:</span>
+                    <strong class="text-dark">{{ job.start_time }} &ndash; {{ job.end_time }} ({{ job.job_date }})</strong>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted small">Expected Pay:</span>
+                    <strong class="text-success fs-6">₹{{ "%.2f"|format(job.payment) }}</strong>
+                  </div>
+                  <p class="text-muted small m-0 pt-2 border-top">
+                    <i class="bi bi-geo-alt-fill text-danger me-1"></i> When you arrive at <strong>{{ job.location }}</strong>, click below to begin your live working timer.
+                  </p>
+                </div>
+
+                <!-- Real-Time Start Job Form -->
+                <form action="{{ url_for('assignment_routes.start_job', assignment_id=user_assignment.id) }}" method="POST">
+                  <button type="submit" class="btn btn-success btn-lg w-100 fw-bold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-play-circle-fill fs-5"></i>
+                    <span>Start Working Now (Live Real-Time)</span>
+                  </button>
+                </form>
+
+              {% elif user_assignment.status == 'In Progress' %}
+                <!-- Live Digital Stopwatch Card -->
+                <div class="live-timer-card p-4 mb-4 text-center">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <span class="online-dot pulsing bg-success"></span>
+                      <span class="small fw-bold text-success text-uppercase" style="letter-spacing: 0.5px;">Live Work Timer Active</span>
+                    </div>
+                    <span class="badge bg-white bg-opacity-10 text-light border border-white border-opacity-10 small">
+                      Clocked in: {{ user_assignment.actual_start_time }}
+                    </span>
+                  </div>
+
+                  <!-- Digital Clock Display -->
+                  <div class="timer-digits-container my-3">
+                    <div class="timer-digit-box">
+                      <div class="timer-digit" id="worker_timer_hrs" data-start-time="{{ user_assignment.actual_start_time }}">00</div>
+                      <div class="timer-label">Hours</div>
+                    </div>
+                    <div class="timer-separator">:</div>
+                    <div class="timer-digit-box">
+                      <div class="timer-digit" id="worker_timer_mins">00</div>
+                      <div class="timer-label">Mins</div>
+                    </div>
+                    <div class="timer-separator">:</div>
+                    <div class="timer-digit-box">
+                      <div class="timer-digit" id="worker_timer_secs">00</div>
+                      <div class="timer-label">Secs</div>
+                    </div>
+                  </div>
+
+                  <!-- Subtitle / Stats -->
+                  <div class="d-flex justify-content-between align-items-center text-light small opacity-75 mt-3 mb-2 px-1">
+                    <span id="worker_elapsed_text"><i class="bi bi-stopwatch me-1"></i> Tracking time elapsed...</span>
+                    <span>Target: <strong>{{ job_scheduled_display or '3.0 hrs' }}</strong> scheduled (₹{{ "%.0f"|format(job.payment) }})</span>
+                  </div>
+
+                  <!-- Scheduled Progress Bar -->
+                  <div class="progress bg-dark bg-opacity-50" style="height: 8px; border-radius: 4px;">
+                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="worker_timer_progress" role="progressbar" style="width: 0%;" data-scheduled-seconds="{{ job_scheduled_seconds or 10800 }}"></div>
+                  </div>
+
+                  {% if user_assignment.late %}
+                    <div class="badge bg-danger text-white mt-3 p-2 d-inline-block">
+                      <i class="bi bi-exclamation-triangle-fill me-1"></i> Late Arrival Flagged (-2 reliability penalty)
+                    </div>
+                  {% endif %}
+                </div>
+
+                <!-- Real-Time Complete Job Form -->
+                <form action="{{ url_for('assignment_routes.complete_job', assignment_id=user_assignment.id) }}" method="POST">
+                  <button type="submit" class="btn btn-danger btn-lg w-100 fw-bold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+                    <i class="bi bi-stop-circle-fill fs-5"></i>
+                    <span id="finishBtnText">Finish Working &amp; Stop Timer</span>
+                  </button>
+                </form>
+
+              {% elif user_assignment.status == 'Awaiting Confirmation' %}
+                <div class="smart-payment-box {% if user_assignment.late %}late{% endif %}">
+                  <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-hourglass-split me-1"></i> Smart Payment Calculated — Awaiting Poster Confirmation</h6>
+                  <div class="row g-2 small">
+                    <div class="col-6"><strong>Scheduled Hours:</strong> {{ user_assignment.scheduled_hours }} hrs</div>
+                    <div class="col-6"><strong>Actual Hours:</strong> {{ user_assignment.actual_hours }} hrs</div>
+                    <div class="col-6"><strong>Scheduled Pay:</strong> ₹{{ "%.2f"|format(job.payment) }}</div>
+                    <div class="col-6"><strong>Calculated Payout:</strong> <span class="text-success fw-bold">₹{{ "%.2f"|format(user_assignment.calculated_payment) }}</span></div>
+                  </div>
+                  {% if user_assignment.late %}
+                    <div class="badge bg-danger-subtle text-danger mt-2">Late arrival flagged</div>
+                  {% endif %}
+                </div>
+
+              {% elif user_assignment.status == 'Completed' %}
+                <div class="alert alert-success d-flex justify-content-between align-items-center m-0">
+                  <div>
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    Job completed! Payment of <strong>₹{{ "%.2f"|format(user_assignment.calculated_payment) }}</strong> has been credited to your wallet.
+                  </div>
+                  <a href="{{ url_for('review_routes.submit_review', job_id=job.id, user_id=job.poster_id) }}" class="btn btn-sm btn-outline-success fw-bold">
+                    <i class="bi bi-star-fill me-1"></i> Review Poster
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+
+          {% elif user_application %}
+            <div class="alert alert-warning d-flex align-items-center justify-content-between m-0">
+              <div>
+                <i class="bi bi-hourglass-split me-1"></i> You applied on {{ user_application.applied_at }}. Status: <strong>{{ user_application.status }}</strong>
+              </div>
+              <span class="badge bg-secondary">Application Pending</span>
+            </div>
+
+          {% else %}
+            {% if job.status == 'Available' %}
+              <form action="{{ url_for('application_routes.apply', job_id=job.id) }}" method="POST">
+                <button type="submit" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
+                  <i class="bi bi-send-fill me-1"></i> Apply for this Job (Earn ₹{{ "%.0f"|format(job.payment) }})
+                </button>
+              </form>
+            {% else %}
+              <div class="alert alert-secondary m-0">
+                This job is currently <strong>{{ job.status }}</strong> and is not accepting new applications.
+              </div>
+            {% endif %}
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- POSTER MANAGEMENT PANEL (If current user is the poster) -->
+      {% if is_poster %}
+        <!-- 1. Assigned / Working Workers -->
+        <div class="card card-custom p-4 mb-4 shadow-sm border-primary">
+          <h5 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-people-fill text-primary me-2"></i>Assigned Workers ({{ assignments|length }}/{{ job.required_workers }})</span>
+            <span class="badge bg-light text-dark border">Escrow Secured: ₹{{ "%.2f"|format(job.payment * job.required_workers) }}</span>
+          </h5>
+
+          {% if assignments %}
+            <div class="list-group list-group-flush">
+              {% for assign in assignments %}
+              <div class="list-group-item p-3 border rounded-3 mb-2 bg-light">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h6 class="fw-bold m-0 d-flex align-items-center gap-1">
+                      <span class="online-dot {% if not assign.is_online %}offline{% endif %}"></span>
+                      {{ assign.worker_name }}
+                    </h6>
+                    <div class="text-muted small">
+                      Reliability: <strong>{{ assign.worker_reliability }}%</strong> &bull; 
+                      Rating: {% if assign.worker_rating %}<span class="star-rating"><i class="bi bi-star-fill"></i> {{ "%.1f"|format(assign.worker_rating) }}</span>{% else %}New User{% endif %}
+                    </div>
+                  </div>
+                  <span class="badge {% if assign.status == 'Completed' %}bg-success{% elif assign.status == 'Awaiting Confirmation' %}bg-warning text-dark{% elif assign.status == 'No Show' %}bg-danger{% else %}bg-info text-dark{% endif %} px-3 py-2">
+                    {{ assign.status }}
+                  </span>
+                </div>
+
+                <!-- Assignment Status & Time Details -->
+                <div class="p-2 bg-white rounded border small mb-3">
+                  {% if assign.status == 'In Progress' and assign.actual_start_time %}
+                    <div class="p-2 bg-dark text-white rounded mb-2 d-flex justify-content-between align-items-center">
+                      <div class="small d-flex align-items-center gap-2">
+                        <span class="online-dot pulsing bg-success" style="width: 8px; height: 8px;"></span>
+                        <span class="text-success fw-bold">Active Working Stopwatch:</span>
+                      </div>
+                      <span class="badge bg-black text-warning border border-warning-subtle font-monospace fs-6 px-2 py-1 shadow-sm" id="assign_timer_{{ assign.id }}" data-start-time="{{ assign.actual_start_time }}">
+                        00:00:00
+                      </span>
+                    </div>
+                  {% elif assign.status in ('Awaiting Confirmation', 'Completed') and assign.actual_start_time %}
+                    <div class="p-2 bg-light text-dark rounded mb-2 d-flex justify-content-between align-items-center border">
+                      <div class="small d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span class="text-success fw-bold">Work Duration Completed:</span>
+                      </div>
+                      <span class="badge bg-dark text-white font-monospace fs-6 px-2 py-1 shadow-sm" id="assign_timer_{{ assign.id }}" data-start-time="{{ assign.actual_start_time }}">
+                        00:00:00 (Completed)
+                      </span>
+                    </div>
+                  {% endif %}
+                  <div class="row g-1">
+                    <div class="col-md-6">Clock In: <strong>{{ assign.actual_start_time or 'Not started yet' }}</strong></div>
+                    <div class="col-md-6">Clock Out: <strong>{{ assign.actual_end_time or 'In progress' }}</strong></div>
+                    {% if assign.actual_hours %}
+                      <div class="col-md-6">Worked: <strong>{{ assign.actual_hours }} hrs</strong> (Scheduled: {{ assign.scheduled_hours }} hrs)</div>
+                      <div class="col-md-6">Calculated Pay: <strong class="text-success fs-6">₹{{ "%.2f"|format(assign.calculated_payment) }}</strong></div>
+                    {% endif %}
+                  </div>
+                  {% if assign.late %}
+                    <span class="badge bg-danger-subtle text-danger mt-1">Late Arrival Flagged (-2 Reliability)</span>
+                  {% endif %}
+                </div>
+
+                <!-- Poster Actions -->
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                  <!-- Call Worker -->
+                  <a href="tel:{{ assign.worker_phone or '+91 97902 34567' }}" class="btn btn-sm btn-success fw-bold d-flex align-items-center gap-1 shadow-sm" title="Call Worker">
+                    <i class="bi bi-telephone-fill"></i> Call
+                  </a>
+
+                  <!-- Chat with Worker -->
+                  <a href="{{ url_for('message_routes.conversation', job_id=job.id, recipient_id=assign.worker_id) }}" class="btn btn-sm btn-outline-primary fw-bold d-flex align-items-center gap-1" title="Message Worker">
+                    <i class="bi bi-chat-dots-fill"></i> Message
+                  </a>
+
+                  {% if assign.status == 'Awaiting Confirmation' %}
+                    <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#confirmModal{{ assign.id }}">
+                      <i class="bi bi-check-circle me-1"></i> Confirm &amp; Release Payment (₹{{ "%.2f"|format(assign.calculated_payment or job.payment) }})
+                    </button>
+                  {% endif %}
+
+                  {% if assign.status in ('Assigned', 'In Progress') %}
+                    <button type="button" class="btn btn-outline-danger btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#noShowModal{{ assign.id }}">
+                      <i class="bi bi-x-circle me-1"></i> Mark No-Show
+                    </button>
+                  {% endif %}
+
+                  {% if assign.status == 'Completed' %}
+                    <a href="{{ url_for('review_routes.submit_review', job_id=job.id, user_id=assign.worker_id) }}" class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-star me-1"></i> Review Worker
+                    </a>
+                  {% endif %}
+                </div>
+
+              </div>
+
+              <!-- Confirm Completion Modal -->
+              {% if assign.status == 'Awaiting Confirmation' %}
+              <div class="modal fade" id="confirmModal{{ assign.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="{{ url_for('assignment_routes.confirm_job', assignment_id=assign.id) }}" method="POST">
+                      <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-shield-check me-2"></i>Confirm Work &amp; Release Escrow</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p>You are confirming completion of work by <strong>{{ assign.worker_name }}</strong> for <strong>{{ job.title }}</strong>.</p>
+                        <div class="smart-payment-box mb-3">
+                          <h6 class="fw-bold mb-2">Payment Summary</h6>
+                          <div class="d-flex justify-content-between mb-1">
+                            <span>Scheduled Amount:</span>
+                            <strong>₹{{ "%.2f"|format(job.payment) }}</strong>
+                          </div>
+                          <div class="d-flex justify-content-between mb-1">
+                            <span>Smart Calculated Payout:</span>
+                            <strong class="text-success">₹{{ "%.2f"|format(assign.calculated_payment or job.payment) }}</strong>
+                          </div>
+                          {% if assign.calculated_payment is not none and job.payment > assign.calculated_payment %}
+                          <div class="d-flex justify-content-between text-primary border-top pt-1 mt-1">
+                            <span>Refund to Your Wallet:</span>
+                            <strong>₹{{ "%.2f"|format(job.payment - assign.calculated_payment) }}</strong>
+                          </div>
+                          {% endif %}
+                        </div>
+                        <p class="small text-muted m-0">This will transfer ₹{{ "%.2f"|format(assign.calculated_payment or job.payment) }} from your secured escrow balance directly to {{ assign.worker_name }}'s wallet.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success fw-bold">Confirm &amp; Release Payment</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              {% endif %}
+
+              <!-- No-Show Modal -->
+              <div class="modal fade" id="noShowModal{{ assign.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <form action="{{ url_for('assignment_routes.no_show', assignment_id=assign.id) }}" method="POST">
+                      <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Report Worker No-Show</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p>Are you sure you want to mark <strong>{{ assign.worker_name }}</strong> as a <strong>No-Show</strong>?</p>
+                        <ul class="small text-muted mb-3">
+                          <li>Worker receives ₹0 payment.</li>
+                          <li>Your payment of ₹{{ "%.2f"|format(job.payment) }} remains securely in your escrow.</li>
+                          <li>Worker's reliability score will be penalized by -10 points.</li>
+                          <li>The job slot will be immediately reopened for other applicants.</li>
+                        </ul>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger fw-bold">Confirm No-Show</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted small m-0">No workers selected yet. Review applicants below to select your worker.</p>
+          {% endif %}
+        </div>
+
+        <!-- 2. Applicant List -->
+        <div class="card card-custom p-4 mb-4 shadow-sm">
+          <h5 class="fw-bold mb-3 d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-person-lines-fill text-primary me-2"></i>Applicants ({{ applicants|length }})</span>
+            <span class="text-muted small">Slots remaining: {{ job.required_workers - assignments|length }}</span>
+          </h5>
+
+          {% if applicants %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle">
+                <thead class="table-light small">
+                  <tr>
+                    <th>Applicant</th>
+                    <th>Location &amp; Skills</th>
+                    <th>Reliability &amp; Stats</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for app in applicants %}
+                  <tr>
+                    <td>
+                      <div class="fw-bold d-flex align-items-center gap-1">
+                        <span class="online-dot {% if not app.worker_is_online %}offline{% endif %}"></span>
+                        <a href="{{ url_for('profile_routes.public_profile', user_id=app.worker_id) }}" class="text-dark text-decoration-none">
+                          {{ app.worker_name }}
+                        </a>
+                      </div>
+                      <div class="small text-muted">{{ app.worker_email }}</div>
+                    </td>
+                    <td>
+                      <div class="small"><i class="bi bi-geo-alt me-1 text-danger"></i>{{ app.worker_location or 'N/A' }}</div>
+                      <div class="small text-muted">{{ app.worker_skills or 'None listed' }}</div>
+                    </td>
+                    <td>
+                      <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ app.worker_reliability }}% score</span>
+                      <div class="small text-muted mt-1">
+                        {% if app.worker_rating %}<span class="star-rating"><i class="bi bi-star-fill"></i> {{ "%.1f"|format(app.worker_rating) }}</span> &bull; {% endif %}
+                        {{ app.worker_completed_jobs }} done
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge {% if app.status == 'Selected' %}bg-success{% elif app.status == 'Rejected' %}bg-danger-subtle text-danger{% else %}bg-secondary-subtle text-secondary{% endif %}">
+                        {{ app.status }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1 align-items-center flex-wrap">
+                        <a href="tel:{{ app.worker_phone or '+91 97902 34567' }}" class="btn btn-sm btn-outline-success" title="Call {{ app.worker_name }}">
+                          <i class="bi bi-telephone-fill"></i>
+                        </a>
+                        <a href="{{ url_for('message_routes.conversation', job_id=job.id, recipient_id=app.worker_id) }}" class="btn btn-sm btn-outline-primary" title="Message {{ app.worker_name }}">
+                          <i class="bi bi-chat-dots-fill"></i>
+                        </a>
+                        {% if app.status == 'Applied' and assignments|length < job.required_workers %}
+                          <form action="{{ url_for('application_routes.select_worker', application_id=app.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-primary fw-bold">
+                              <i class="bi bi-check-lg me-1"></i> Select
+                            </button>
+                          </form>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="p-4 text-center text-muted">
+              <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+              No applications submitted for this job yet.
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Right Column: Poster Profile Card & Safe Escrow Badge -->
+    <div class="col-lg-4">
+      
+      <!-- Poster Card -->
+      <div class="card card-custom p-4 mb-4 shadow-sm">
+        <h5 class="fw-bold mb-3">Job Posted By</h5>
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 54px; height: 54px;">
+            {{ job.poster_name[0] }}
+          </div>
+          <div>
+            <h6 class="fw-bold m-0 d-flex align-items-center gap-1">
+              <span class="online-dot {% if not job.poster_is_online %}offline{% endif %}"></span>
+              {{ job.poster_name }}
+            </h6>
+            <div class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ job.poster_location or 'Location not set' }}</div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 mt-1 small">
+              <i class="bi bi-patch-check-fill text-success me-1"></i> Verified Genuine Employer
+            </span>
+          </div>
+        </div>
+
+        <!-- Employer Genuine Verification Checklist -->
+        <div class="card bg-white border border-success-subtle p-3 rounded-3 mb-3 shadow-sm">
+          <div class="fw-bold small text-success d-flex align-items-center gap-1 mb-2">
+            <i class="bi bi-shield-fill-check"></i> Genuine Employer Trust Badges
+          </div>
+          <div class="d-flex flex-column gap-2 small" style="font-size: 11.5px;">
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="text-muted"><i class="bi bi-building-check me-1 text-primary"></i> Business Verification:</span>
+              <span class="badge bg-light text-dark border">GSTIN 33AABCT1332L1Z9</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="text-muted"><i class="bi bi-lock-fill me-1 text-success"></i> Escrow Deposit:</span>
+              <strong class="text-success">100% Pre-Funded (₹{{ "%.2f"|format(job.payment * job.required_workers) }})</strong>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="text-muted"><i class="bi bi-award-fill me-1 text-warning"></i> Payout Track Record:</span>
+              <span class="text-dark fw-bold">100% On-Time (0 Disputes)</span>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="text-muted"><i class="bi bi-telephone-check-fill me-1 text-info"></i> Phone Verification:</span>
+              <span class="text-dark fw-semibold">{{ job.poster_phone or '+91 98401 23456' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between p-2 bg-light rounded-3 mb-3 small">
+          <div>
+            <span class="text-muted d-block">Reliability</span>
+            <strong class="text-primary">{{ job.poster_reliability }}%</strong>
+          </div>
+          <div>
+            <span class="text-muted d-block">Rating</span>
+            {% if job.poster_rating %}
+              <strong class="star-rating"><i class="bi bi-star-fill"></i> {{ "%.1f"|format(job.poster_rating) }}</strong>
+            {% else %}
+              <span class="text-muted">Verified Poster</span>
+            {% endif %}
+          </div>
+        </div>
+
+        {% if current_user and not is_poster %}
+          <!-- Contact Poster Action Buttons -->
+          <div class="d-flex flex-column gap-2 mb-3">
+            <a href="tel:{{ job.poster_phone or '+91 98401 23456' }}" class="btn btn-success fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm py-2" id="callPosterBtn">
+              <i class="bi bi-telephone-fill fs-5"></i>
+              <span>Call {{ job.poster_name }}</span>
+            </a>
+            <div class="d-flex gap-2">
+              <a href="{{ url_for('message_routes.conversation', job_id=job.id, recipient_id=job.poster_id) }}" class="btn btn-primary flex-fill fw-bold d-flex align-items-center justify-content-center gap-1 shadow-sm">
+                <i class="bi bi-chat-dots-fill"></i> Message
+              </a>
+              <a href="https://wa.me/{{ (job.poster_phone or '+919840123456')|replace(' ', '')|replace('+', '') }}?text=Hi%20{{ job.poster_name }},%20I%20am%20interested%20in%20your%20QuickHire%20job:%20{{ job.title }}" target="_blank" class="btn btn-outline-success flex-fill fw-bold d-flex align-items-center justify-content-center gap-1">
+                <i class="bi bi-whatsapp"></i> WhatsApp
+              </a>
+            </div>
+          </div>
+        {% elif not current_user %}
+          <div class="alert alert-light border p-2 text-center small text-muted mb-3">
+            <a href="{{ url_for('auth_routes.login') }}" class="fw-bold text-primary text-decoration-none">Log in</a> to call or message the employer.
+          </div>
+        {% endif %}
+
+        <a href="{{ url_for('profile_routes.public_profile', user_id=job.poster_id) }}" class="btn btn-outline-secondary btn-sm w-100 fw-semibold">
+          View Public Profile
+        </a>
+      </div>
+
+      <!-- Escrow Guarantee Box -->
+      <div class="card card-custom p-4 shadow-sm bg-light border-0">
+        <div class="d-flex align-items-center gap-2 mb-2 text-success">
+          <i class="bi bi-shield-check fs-4"></i>
+          <strong class="fs-6">100% Escrow Protected</strong>
+        </div>
+        <p class="small text-muted mb-0">
+          The poster has already secured ₹{{ "%.2f"|format(job.payment * job.required_workers) }} in QuickHire Vault. Funds are transferred upon confirmed completion.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    {% if user_assignment and user_assignment.status == 'In Progress' and user_assignment.actual_start_time %}
+      window.initLiveJobTimer("{{ user_assignment.actual_start_time }}", "worker", {{ job_scheduled_seconds or 10800 }});
+    {% endif %}
+
+    {% if assignments %}
+      {% for assign in assignments %}
+        {% if assign.status in ('In Progress', 'Awaiting Confirmation', 'Completed') and assign.actual_start_time %}
+          window.initBannerTimer(
+            "{{ assign.actual_start_time }}",
+            "assign_timer_{{ assign.id }}",
+            {{ job_scheduled_seconds or 10800 }},
+            "{{ assign.actual_end_time or '' }}"
+          );
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    // Real-Time Ultra-Fast Sub-Second Live Sync (800ms)
+    window.startLiveSync(
+      {{ job.id }},
+      "{{ user_assignment.status if user_assignment else '' }}",
+      "{{ job.status }}",
+      {{ applicants|length if applicants else 0 }}
+    );
+  });
+</script>
+{% endblock %}

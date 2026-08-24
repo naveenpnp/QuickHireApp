@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 80" width="300" height="80">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4f46e5" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <!-- Icon -->
+  <rect x="10" y="15" width="50" height="50" rx="14" fill="url(#grad)" />
+  <path d="M 35 25 L 26 43 L 34 43 L 32 55 L 44 37 L 36 37 Z" fill="#ffffff" />
+  <!-- Text -->
+  <text x="72" y="48" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="30" font-weight="800" fill="#1e293b">Quick<tspan fill="#4f46e5">Hire</tspan></text>
+  <text x="74" y="62" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="600" fill="#64748b" letter-spacing="1.5">INSTANT WORK &amp; HIRE</text>
+</svg>

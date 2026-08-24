@@ -1,0 +1,17 @@
+# Python & Environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+venv/
+env/
+.venv/
+
+# Database (optional to ignore or keep)
+database/quickhire.db-journal
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

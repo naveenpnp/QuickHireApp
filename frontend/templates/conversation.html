@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Chat with {{ recipient.name }} — QuickHire{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header & Back Navigation -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="text-decoration-none text-muted small">
+      <i class="bi bi-arrow-left me-1"></i> Back to Job Details
+    </a>
+    <a href="{{ url_for('message_routes.inbox') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-inbox me-1"></i> All Messages
+    </a>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card card-custom shadow-sm overflow-hidden">
+        
+        <!-- Chat Header Card -->
+        <div class="card-header bg-white p-3 border-bottom d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 44px; height: 44px;">
+              {{ recipient.name[0] }}
+            </div>
+            <div>
+              <h6 class="fw-bold m-0 d-flex align-items-center gap-2">
+                {{ recipient.name }}
+                <span class="online-dot {% if not recipient.is_online %}offline{% else %}pulsing{% endif %}"></span>
+              </h6>
+              <div class="text-muted small" style="font-size: 11px;">
+                Job: <strong>{{ job.title }}</strong> &bull; <i class="bi bi-geo-alt text-danger"></i>{{ recipient.location or 'Location not set' }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Contact Buttons -->
+          <div class="d-flex gap-2">
+            <!-- Direct Phone Call Button -->
+            <a href="tel:{{ recipient.phone or '+919876543210' }}" class="btn btn-sm btn-success fw-bold d-flex align-items-center gap-1 shadow-sm" title="Call {{ recipient.name }}">
+              <i class="bi bi-telephone-fill"></i> <span class="d-none d-sm-inline">Call</span>
+            </a>
+
+            <!-- WhatsApp Direct Link -->
+            <a href="https://wa.me/{{ (recipient.phone or '+919876543210')|replace(' ', '')|replace('+', '') }}?text=Hi%20{{ recipient.name }},%20I%20am%20reaching%20out%20regarding%20the%20job:%20{{ job.title }}" target="_blank" class="btn btn-sm btn-outline-success fw-bold d-flex align-items-center gap-1" title="WhatsApp Message">
+              <i class="bi bi-whatsapp"></i> <span class="d-none d-sm-inline">WhatsApp</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div class="card-body p-4 bg-light" id="chatContainer" style="min-height: 360px; max-height: 480px; overflow-y: auto;">
+          {% if chat_history %}
+            {% for msg in chat_history %}
+              <div class="d-flex mb-3 {% if msg.sender_id == user.id %}justify-content-end{% else %}justify-content-start{% endif %}">
+                <div class="card border-0 shadow-sm p-3 {% if msg.sender_id == user.id %}bg-primary text-white{% else %}bg-white text-dark{% endif %}" style="max-width: 75%; border-radius: 16px;">
+                  <div class="small fw-semibold mb-1 opacity-75" style="font-size: 11px;">
+                    {{ msg.sender_name }} &bull; {{ msg.created_at }}
+                  </div>
+                  <div class="message-body" style="white-space: pre-line;">{{ msg.message }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="p-5 text-center text-muted">
+              <i class="bi bi-chat-dots fs-1 d-block mb-2 text-primary opacity-50"></i>
+              <h6>No messages yet with {{ recipient.name }}</h6>
+              <p class="small text-muted m-0">Send a message below to discuss work location, equipment, or timing.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="card-footer bg-white p-3 border-top">
+          <form method="POST" action="{{ url_for('message_routes.conversation', job_id=job.id, recipient_id=recipient.id) }}" class="d-flex gap-2">
+            <input type="text" class="form-control" name="message" placeholder="Type your message here..." autocomplete="off" required autofocus>
+            <button type="submit" class="btn btn-primary px-4 fw-bold shadow-sm d-flex align-items-center gap-1">
+              <i class="bi bi-send-fill"></i> <span>Send</span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Auto-scroll chat to bottom
+  const container = document.getElementById('chatContainer');
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_submission %}Leave a Review — QuickHire{% else %}My Reviews — QuickHire{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  {% if is_submission %}
+    <!-- Review Submission Form -->
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card card-custom p-4 p-md-5 shadow-md">
+          
+          <div class="text-center mb-4">
+            <div class="stat-icon bg-warning-subtle text-warning-emphasis mx-auto mb-2" style="width: 56px; height: 56px; font-size: 1.75rem;">
+              <i class="bi bi-star-fill"></i>
+            </div>
+            <h3 class="fw-bold">Rate Your Experience</h3>
+            <p class="text-muted small">
+              Share your feedback for <strong>{{ target_user.name }}</strong> on job <em>{{ job.title }}</em>
+            </p>
+          </div>
+
+          <form method="POST" action="{{ url_for('review_routes.submit_review', job_id=job.id, user_id=target_user.id) }}">
+            
+            <!-- Star Rating Input -->
+            <div class="mb-4 text-center">
+              <label class="form-label fw-semibold small d-block mb-2">Select Star Rating (1 to 5 Stars) <span class="text-danger">*</span></label>
+              <div class="rating-input justify-content-center">
+                <input type="radio" id="star5" name="rating" value="5" required /><label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+              </div>
+            </div>
+
+            <!-- Optional Review Text -->
+            <div class="mb-4">
+              <label for="review" class="form-label fw-semibold small">Written Feedback (Optional)</label>
+              <textarea class="form-control" id="review" name="review" rows="4" placeholder="How was punctuality, communication, and work quality?"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+              <i class="bi bi-send-fill me-1"></i> Submit Review &amp; Update Rating
+            </button>
+            <div class="text-center mt-3">
+              <a href="{{ url_for('job_routes.my_jobs', tab='completed') }}" class="text-muted small text-decoration-none">Skip for now</a>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- Reviews Overview Page -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="fw-extrabold m-0">Ratings &amp; Reviews</h2>
+        <p class="text-muted small m-0">Feedback you have received and given across all completed jobs</p>
+      </div>
+      <a href="{{ url_for('main_routes.dashboard') }}" class="btn btn-outline-primary fw-semibold">Back to Dashboard</a>
+    </div>
+
+    <div class="row g-4">
+      <!-- Reviews Received -->
+      <div class="col-md-6">
+        <div class="card card-custom h-100 shadow-sm">
+          <div class="card-header bg-white py-3">
+            <h5 class="fw-bold m-0"><i class="bi bi-star-fill text-warning me-2"></i>Reviews Received ({{ received_reviews|length }})</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if received_reviews %}
+              <div class="list-group list-group-flush">
+                {% for r in received_reviews %}
+                <div class="list-group-item p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold">{{ r.reviewer_name }}</span>
+                    <span class="star-rating">
+                      {% for i in range(r.rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                    </span>
+                  </div>
+                  <div class="text-muted small mb-1">Job: {{ r.job_title }}</div>
+                  <p class="small text-secondary m-0">{{ r.review or 'No written comments.' }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="p-4 text-center text-muted">No reviews received yet.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Given -->
+      <div class="col-md-6">
+        <div class="card card-custom h-100 shadow-sm">
+          <div class="card-header bg-white py-3">
+            <h5 class="fw-bold m-0"><i class="bi bi-pencil me-2 text-primary"></i>Reviews Given ({{ given_reviews|length }})</h5>
+          </div>
+          <div class="card-body p-0">
+            {% if given_reviews %}
+              <div class="list-group list-group-flush">
+                {% for r in given_reviews %}
+                <div class="list-group-item p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-bold">Reviewed: {{ r.reviewed_name }}</span>
+                    <span class="star-rating">
+                      {% for i in range(r.rating) %}<i class="bi bi-star-fill"></i>{% endfor %}
+                    </span>
+                  </div>
+                  <div class="text-muted small mb-1">Job: {{ r.job_title }}</div>
+                  <p class="small text-secondary m-0">{{ r.review or 'No written comments.' }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="p-4 text-center text-muted">You haven't submitted any reviews yet.</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

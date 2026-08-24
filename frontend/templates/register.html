@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Register — QuickHire{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7 col-md-9">
+      
+      <div class="card card-custom p-4 p-md-5 shadow-md">
+        
+        <!-- Header Banner -->
+        <div class="text-center mb-4">
+          <div id="roleHeaderIcon" class="stat-icon {% if selected_role == 'employer' %}bg-primary-subtle text-primary{% else %}bg-success-subtle text-success{% endif %} mx-auto mb-2" style="width: 50px; height: 50px; font-size: 1.4rem;">
+            <i id="roleHeaderIconInner" class="bi {% if selected_role == 'employer' %}bi-building-fill{% else %}bi-person-workspace{% endif %}"></i>
+          </div>
+          <h3 class="fw-extrabold m-0" id="regTitle">
+            {% if selected_role == 'employer' %}Employer Registration{% else %}Worker Registration{% endif %}
+          </h3>
+          <p class="text-muted small mt-1" id="regSubtitle">
+            {% if selected_role == 'employer' %}
+              Create an employer account to post tasks, secure escrow funds, and hire verified local workers.
+            {% else %}
+              Create a worker profile to apply for local gigs, track work hours, and earn instant wallet payouts.
+            {% endif %}
+          </p>
+          <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill mt-1">
+            <i class="bi bi-gift-fill me-1"></i> Welcome Wallet Credit: <strong>₹5,000.00</strong> &bull; 100% Reliability Score
+          </div>
+        </div>
+
+        <!-- Google Quick Sign-Up -->
+        <a href="{{ url_for('auth_routes.google_auth', role=selected_role) }}" id="googleRegBtn" class="btn btn-outline-dark w-100 py-2 mb-3 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-2 border rounded-3 bg-white">
+          <svg width="18" height="18" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <span id="googleRegText">Quick Sign-Up with Google</span>
+        </a>
+
+        <div class="d-flex align-items-center my-3">
+          <hr class="flex-grow-1 m-0">
+          <span class="px-3 text-muted small" style="font-size: 11px;">OR REGISTER WITH EMAIL</span>
+          <hr class="flex-grow-1 m-0">
+        </div>
+
+        <form method="POST" action="{{ url_for('auth_routes.register') }}" id="registrationForm">
+          
+          <!-- Role Selection Cards -->
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-dark d-block mb-2">
+              Select Your Role <span class="text-danger">*</span>
+            </label>
+            <div class="row g-2">
+              <div class="col-6">
+                <input type="radio" class="btn-check" name="role" id="role_employer" value="employer" {% if selected_role == 'employer' %}checked{% endif %} onchange="updateRoleForm('employer')" required>
+                <label class="btn btn-outline-primary w-100 p-3 text-start rounded-3 h-100 border-2" for="role_employer">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="fw-bold fs-6"><i class="bi bi-building me-1"></i> Employer</span>
+                    <i class="bi bi-check-circle-fill text-primary d-none role-check-emp"></i>
+                  </div>
+                  <div class="small text-muted" style="font-size: 11px; line-height: 1.3;">Hire workers, post gig requirements &amp; manage escrows</div>
+                </label>
+              </div>
+
+              <div class="col-6">
+                <input type="radio" class="btn-check" name="role" id="role_worker" value="worker" {% if selected_role != 'employer' %}checked{% endif %} onchange="updateRoleForm('worker')" required>
+                <label class="btn btn-outline-success w-100 p-3 text-start rounded-3 h-100 border-2" for="role_worker">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <span class="fw-bold fs-6"><i class="bi bi-person-workspace me-1"></i> Worker</span>
+                    <i class="bi bi-check-circle-fill text-success d-none role-check-wrk"></i>
+                  </div>
+                  <div class="small text-muted" style="font-size: 11px; line-height: 1.3;">Find nearby gigs, clock in/out &amp; earn instant money</div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Basic User Info -->
+          <div class="mb-3">
+            <label for="name" class="form-label fw-semibold small" id="nameLabel">
+              {% if selected_role == 'employer' %}Full Name / Business Representative <span class="text-danger">*</span>{% else %}Full Name <span class="text-danger">*</span>{% endif %}
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-person text-muted"></i></span>
+              <input type="text" class="form-control" id="name" name="name" value="{{ name or '' }}" placeholder="e.g. Ramesh Kumar" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label fw-semibold small">Email Address <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-envelope text-muted"></i></span>
+              <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" placeholder="ramesh@gmail.com" required>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label fw-semibold small">Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-lock text-muted"></i></span>
+              <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+              <button class="btn btn-outline-secondary border" type="button" onclick="togglePasswordVisibility('password', this)" title="Show / Hide Password">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-3">
+            <div class="col-md-6">
+              <label for="location" class="form-label fw-semibold small" id="locationLabel">
+                {% if selected_role == 'employer' %}Business Location / City{% else %}Preferred Work City / Area{% endif %}
+              </label>
+              <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-geo-alt text-muted"></i></span>
+                <input type="text" class="form-control" id="location" name="location" value="{{ location or '' }}" placeholder="{% if selected_role == 'employer' %}e.g. Trichy Main, Chennai Tech Park{% else %}e.g. Trichy, Anna Nagar Chennai{% endif %}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="phone" class="form-label fw-semibold small">Phone Number (For Calls &amp; WhatsApp)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-telephone text-muted"></i></span>
+                <input type="text" class="form-control" id="phone" name="phone" value="{{ phone or '' }}" placeholder="+91 98765 43210">
+              </div>
+            </div>
+          </div>
+
+          <!-- ROLE-SPECIFIC WORK SPECIFICATION SECTION -->
+          <div class="card p-3 mb-4 rounded-3 border" id="workSpecCard" style="background-color: {% if selected_role == 'employer' %}#f8f9ff{% else %}#f6fbf8{% endif %};">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <i id="specIcon" class="bi {% if selected_role == 'employer' %}bi-briefcase-fill text-primary{% else %}bi-tools text-success{% endif %} fs-5"></i>
+              <label for="skills" class="form-label fw-bold small m-0 text-dark" id="specLabel">
+                {% if selected_role == 'employer' %}
+                  Hiring Requirements &amp; Work Categories
+                {% else %}
+                  My Skills &amp; Work Specializations
+                {% endif %}
+              </label>
+            </div>
+
+            <div class="input-group mb-2">
+              <input type="text" class="form-control bg-white" id="skills" name="skills" value="{{ skills or '' }}" placeholder="{% if selected_role == 'employer' %}e.g. Event Management, Logistics, Retail Staff, Photography{% else %}e.g. Photography, Delivery, Excel Typing, Catering Helper{% endif %}">
+            </div>
+
+            <div class="d-flex align-items-center gap-1 flex-wrap" id="quickTagsContainer">
+              <span class="small text-muted me-1" style="font-size: 11px;">Suggested Tags:</span>
+              <span id="quickTagsList">
+                <!-- Injected via JavaScript based on role -->
+              </span>
+            </div>
+            
+            <small class="text-muted mt-2 d-block" style="font-size: 11px;" id="specHelp">
+              {% if selected_role == 'employer' %}
+                <i class="bi bi-info-circle me-1"></i> Specify the roles or services you frequently hire helpers for.
+              {% else %}
+                <i class="bi bi-info-circle me-1"></i> Add your top skills separated by commas to get matched with high-paying local gigs.
+              {% endif %}
+            </small>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn {% if selected_role == 'employer' %}btn-primary{% else %}btn-success{% endif %} w-100 py-2 fw-bold mb-3 shadow-sm" id="submitBtn">
+            <i class="bi bi-check2-circle me-1"></i> 
+            <span id="submitBtnText">
+              {% if selected_role == 'employer' %}Register as Employer &amp; Start Hiring{% else %}Register as Worker &amp; Start Earning{% endif %}
+            </span>
+          </button>
+        </form>
+
+        <div class="text-center small text-muted pt-2 border-top">
+          Already have an account? 
+          <a href="{{ url_for('auth_routes.login', role=selected_role) }}" class="fw-bold text-decoration-none {% if selected_role == 'employer' %}text-primary{% else %}text-success{% endif %}" id="loginLink">
+            Log in to your portal here
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const employerTags = ['Event Management', 'Delivery & Logistics', 'Retail & Sales', 'Photography', 'Cleaning Help', 'Catering Staff'];
+  const workerTags = ['Photography', 'Delivery Driving', 'Excel & Data Entry', 'Event Crew', 'Electrician', 'Warehouse Help'];
+
+  function updateRoleForm(role) {
+    const isEmployer = (role === 'employer');
+    
+    // Header
+    const headerIcon = document.getElementById('roleHeaderIcon');
+    const headerIconInner = document.getElementById('roleHeaderIconInner');
+    const regTitle = document.getElementById('regTitle');
+    const regSubtitle = document.getElementById('regSubtitle');
+    const workSpecCard = document.getElementById('workSpecCard');
+    const specIcon = document.getElementById('specIcon');
+    const specLabel = document.getElementById('specLabel');
+    const skillsInput = document.getElementById('skills');
+    const specHelp = document.getElementById('specHelp');
+    const nameLabel = document.getElementById('nameLabel');
+    const locationLabel = document.getElementById('locationLabel');
+    const locationInput = document.getElementById('location');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const loginLink = document.getElementById('loginLink');
+
+    if (isEmployer) {
+      headerIcon.className = 'stat-icon bg-primary-subtle text-primary mx-auto mb-2';
+      headerIconInner.className = 'bi bi-building-fill';
+      regTitle.textContent = 'Employer Registration';
+      regSubtitle.textContent = 'Create an employer account to post tasks, secure escrow funds, and hire verified local workers.';
+      
+      nameLabel.innerHTML = 'Full Name / Business Representative <span class="text-danger">*</span>';
+      locationLabel.textContent = 'Business Location / City';
+      locationInput.placeholder = 'e.g. Trichy Main, Chennai Tech Park';
+
+      workSpecCard.style.backgroundColor = '#f8f9ff';
+      specIcon.className = 'bi bi-briefcase-fill text-primary fs-5';
+      specLabel.textContent = 'Hiring Requirements & Work Categories';
+      skillsInput.placeholder = 'e.g. Event Management, Logistics, Retail Staff, Photography';
+      specHelp.innerHTML = '<i class="bi bi-info-circle me-1"></i> Specify the roles or services you frequently hire helpers for.';
+
+      submitBtn.className = 'btn btn-primary w-100 py-2 fw-bold mb-3 shadow-sm';
+      submitBtnText.textContent = 'Register as Employer & Start Hiring';
+      
+      loginLink.className = 'fw-bold text-decoration-none text-primary';
+      loginLink.href = '{{ url_for("auth_routes.login", role="employer") }}';
+
+      const googleBtn = document.getElementById('googleRegBtn');
+      if (googleBtn) googleBtn.href = '{{ url_for("auth_routes.google_auth") }}?role=employer';
+
+      renderTags(employerTags);
+    } else {
+      headerIcon.className = 'stat-icon bg-success-subtle text-success mx-auto mb-2';
+      headerIconInner.className = 'bi bi-person-workspace';
+      regTitle.textContent = 'Worker Registration';
+      regSubtitle.textContent = 'Create a worker profile to apply for local gigs, track work hours, and earn instant wallet payouts.';
+      
+      nameLabel.innerHTML = 'Full Name <span class="text-danger">*</span>';
+      locationLabel.textContent = 'Preferred Work City / Area';
+      locationInput.placeholder = 'e.g. Trichy, Anna Nagar Chennai';
+
+      workSpecCard.style.backgroundColor = '#f6fbf8';
+      specIcon.className = 'bi bi-tools text-success fs-5';
+      specLabel.textContent = 'My Skills & Work Specializations';
+      skillsInput.placeholder = 'e.g. Photography, Delivery, Excel Typing, Catering Helper';
+      specHelp.innerHTML = '<i class="bi bi-info-circle me-1"></i> Add your top skills separated by commas to get matched with high-paying local gigs.';
+
+      submitBtn.className = 'btn btn-success w-100 py-2 fw-bold mb-3 shadow-sm';
+      submitBtnText.textContent = 'Register as Worker & Start Earning';
+
+      loginLink.className = 'fw-bold text-decoration-none text-success';
+      loginLink.href = '{{ url_for("auth_routes.login", role="worker") }}';
+
+      const googleBtn = document.getElementById('googleRegBtn');
+      if (googleBtn) googleBtn.href = '{{ url_for("auth_routes.google_auth") }}?role=worker';
+
+      renderTags(workerTags);
+    }
+  }
+
+  function renderTags(tags) {
+    const list = document.getElementById('quickTagsList');
+    if (!list) return;
+    list.innerHTML = '';
+    tags.forEach(t => {
+      const tagBtn = document.createElement('button');
+      tagBtn.type = 'button';
+      tagBtn.className = 'badge bg-white text-dark border me-1 mb-1 p-1 px-2 text-decoration-none cursor-pointer';
+      tagBtn.textContent = '+ ' + t;
+      tagBtn.onclick = function() {
+        addTagToInput(t);
+      };
+      list.appendChild(tagBtn);
+    });
+  }
+
+  function addTagToInput(tag) {
+    const input = document.getElementById('skills');
+    if (!input) return;
+    let current = input.value.trim();
+    if (!current) {
+      input.value = tag;
+    } else {
+      const parts = current.split(',').map(s => s.trim());
+      if (!parts.includes(tag)) {
+        input.value = current + ', ' + tag;
+      }
+    }
+  }
+
+  // Initial tag render on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    const isEmployer = document.getElementById('role_employer').checked;
+    updateRoleForm(isEmployer ? 'employer' : 'worker');
+  });
+</script>
+{% endblock %}
