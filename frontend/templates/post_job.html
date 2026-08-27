@@ -77,15 +77,35 @@
 
           <!-- Schedule: Start & End Time -->
           <div class="card p-3 bg-light border mb-4 rounded-3">
-            <label class="form-label fw-bold small text-dark mb-2">
-              <i class="bi bi-clock-history text-primary me-1"></i> Work Shift Timings
-            </label>
+            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+              <label class="form-label fw-bold small text-dark m-0">
+                <i class="bi bi-clock-history text-primary me-1"></i> Work Shift Timings
+              </label>
+              <div class="d-flex gap-1 flex-wrap">
+                <button type="button" class="btn btn-xs btn-outline-primary fw-bold py-1 px-2 small" onclick="setShiftTiming(2)" title="Set quick 2 minute shift for live testing">
+                  ⚡ 2 Mins Test
+                </button>
+                <button type="button" class="btn btn-xs btn-outline-secondary fw-semibold py-1 px-2 small" onclick="setShiftTiming(15)">
+                  15 Mins
+                </button>
+                <button type="button" class="btn btn-xs btn-outline-secondary fw-semibold py-1 px-2 small" onclick="setShiftTiming(60)">
+                  1 Hour
+                </button>
+                <button type="button" class="btn btn-xs btn-outline-secondary fw-semibold py-1 px-2 small" onclick="setShiftTiming(120)">
+                  2 Hours
+                </button>
+                <button type="button" class="btn btn-xs btn-outline-secondary fw-semibold py-1 px-2 small" onclick="setShiftTiming(240)">
+                  4 Hours
+                </button>
+              </div>
+            </div>
+
             <div class="row g-3">
               <div class="col-md-6">
                 <label for="start_time" class="form-label fw-semibold small">Start Time <span class="text-danger">*</span></label>
                 <div class="input-group">
                   <span class="input-group-text bg-white"><i class="bi bi-clock text-muted"></i></span>
-                  <input type="time" class="form-control" id="start_time" name="start_time" value="{{ form.start_time or '09:00' }}" required>
+                  <input type="time" class="form-control" id="start_time" name="start_time" value="{{ form.start_time or '' }}" required>
                 </div>
               </div>
 
@@ -93,7 +113,7 @@
                 <label for="end_time" class="form-label fw-semibold small">End Time <span class="text-danger">*</span></label>
                 <div class="input-group">
                   <span class="input-group-text bg-white"><i class="bi bi-clock-fill text-muted"></i></span>
-                  <input type="time" class="form-control" id="end_time" name="end_time" value="{{ form.end_time or '17:00' }}" required>
+                  <input type="time" class="form-control" id="end_time" name="end_time" value="{{ form.end_time or '' }}" required>
                 </div>
               </div>
             </div>
@@ -101,7 +121,7 @@
             <!-- Calculated Shift Duration Preview -->
             <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top small text-muted">
               <span>Expected Shift Duration:</span>
-              <strong class="text-primary fs-6" id="durationBadge">8.0 Hours</strong>
+              <strong class="text-primary fs-6" id="durationBadge">2 Hours</strong>
             </div>
           </div>
 
@@ -113,26 +133,33 @@
 
             <div class="row g-3 mb-3">
               <div class="col-md-6">
-                <label for="required_workers" class="form-label fw-semibold small">Number of Workers Needed</label>
-                <input type="number" class="form-control" id="required_workers" name="required_workers" min="1" max="100" step="1" value="{{ form.required_workers or '1' }}" required>
+                <label for="payment" class="form-label fw-semibold small">Payment per Worker (₹) <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white fw-bold">₹</span>
+                  <input type="number" step="1" min="50" class="form-control fw-bold" id="payment" name="payment" value="{{ form.payment or '500' }}" placeholder="500" required>
+                </div>
               </div>
 
               <div class="col-md-6">
-                <label for="payment" class="form-label fw-semibold small">Payment Amount per Worker (₹)</label>
-                <input type="number" class="form-control" id="payment" name="payment" min="1" step="any" value="{{ form.payment or '800' }}" placeholder="e.g. 500" required>
+                <label for="required_workers" class="form-label fw-semibold small">Number of Workers Needed <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-white"><i class="bi bi-people text-muted"></i></span>
+                  <input type="number" min="1" max="50" class="form-control" id="required_workers" name="required_workers" value="{{ form.required_workers or '1' }}" required>
+                </div>
               </div>
             </div>
 
-            <!-- Dynamic Escrow Summary Box -->
-            <div class="p-3 bg-white rounded border d-flex justify-content-between align-items-center">
+            <!-- Live Escrow Lock Summary Card -->
+            <div class="p-3 bg-white rounded border border-primary-subtle d-flex justify-content-between align-items-center flex-wrap gap-2">
               <div>
-                <span class="text-muted small d-block">Total Amount to be Placed in Escrow:</span>
-                <span class="fs-4 fw-extrabold text-primary" id="totalEscrowDisplay" data-wallet-balance="{{ current_user.wallet_balance }}">₹800.00</span>
+                <div class="text-muted small fw-semibold text-uppercase" style="letter-spacing: 0.5px;">Total Escrow Required</div>
+                <div class="display-6 fw-extrabold text-primary" id="totalEscrowDisplay" data-wallet-balance="{{ current_user.wallet_balance }}">₹500.00</div>
               </div>
-              <div class="text-end">
-                <span class="badge bg-success-subtle text-success border border-success-subtle p-2">
-                  <i class="bi bi-shield-lock me-1"></i> 100% Escrow Protected
-                </span>
+              <div class="text-end small">
+                <span class="text-muted d-block">Your Available Balance:</span>
+                <strong class="{% if current_user.wallet_balance < 500 %}text-danger{% else %}text-success{% endif %} fs-6">
+                  ₹{{ "%.2f"|format(current_user.wallet_balance) }}
+                </strong>
               </div>
             </div>
 
@@ -151,7 +178,6 @@
           </div>
 
         </form>
-
       </div>
 
     </div>
@@ -161,12 +187,26 @@
 
 {% block extra_js %}
 <script>
-  // Set default date to tomorrow if empty
+  // Set default date to TODAY if empty
   const dateInput = document.getElementById('job_date');
   if (dateInput && !dateInput.value) {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    dateInput.value = tomorrow.toISOString().split('T')[0];
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    dateInput.value = `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Set real-time start and end time if empty
+  const startInput = document.getElementById('start_time');
+  const endInput = document.getElementById('end_time');
+  if (startInput && !startInput.value) {
+    const now = new Date();
+    startInput.value = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  }
+  if (endInput && !endInput.value) {
+    const later = new Date(new Date().getTime() + 2 * 3600000);
+    endInput.value = `${String(later.getHours()).padStart(2, '0')}:${String(later.getMinutes()).padStart(2, '0')}`;
   }
 
   // Calculate shift duration
@@ -181,8 +221,12 @@
     let diffMinutes = (eh * 60 + em) - (sh * 60 + sm);
     if (diffMinutes < 0) diffMinutes += 24 * 60; // overnight shift
 
-    const hours = (diffMinutes / 60).toFixed(1);
-    badge.textContent = `${hours} Hours`;
+    if (diffMinutes < 60) {
+      badge.textContent = `${diffMinutes} Mins`;
+    } else {
+      const hours = (diffMinutes / 60).toFixed(1);
+      badge.textContent = `${hours} Hours (${diffMinutes} mins)`;
+    }
   }
 
   document.getElementById('start_time')?.addEventListener('change', updateDurationBadge);

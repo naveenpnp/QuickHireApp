@@ -26,32 +26,31 @@ def seed_database(conn=None):
 
     cursor = conn.cursor()
 
-    # 1. Seed Categories
-    for name, icon in CATEGORIES:
-        cursor.execute(
-            "INSERT OR IGNORE INTO categories (name, icon) VALUES (?, ?)",
-            (name, icon)
-        )
+    # 1. Seed Categories if empty
+    cursor.execute("SELECT COUNT(*) FROM categories")
+    cat_count = cursor.fetchone()[0]
+    if cat_count == 0:
+        for name, icon in CATEGORIES:
+            cursor.execute(
+                "INSERT OR IGNORE INTO categories (name, icon) VALUES (?, ?)",
+                (name, icon)
+            )
 
-    # 2. Seed Users
-    # arun@gmail.com / 123456
-    # rahul@gmail.com / 123456
+    # 2. Seed Users if not existing
+    cursor.execute("SELECT COUNT(*) FROM users")
+    user_count = cursor.fetchone()[0]
     pwd_hash = generate_password_hash("123456")
 
-    # Initial wallets: ₹5,000 each with phone numbers & roles
-    cursor.execute("""
-        INSERT OR IGNORE INTO users (name, email, password, skills, location, phone, role, wallet_balance, secured_balance, rating, reliability_score, completed_jobs, late_arrivals, no_shows, is_online)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, ("Arun Kumar", "arun@gmail.com", pwd_hash, "Event Management, Photography, Logistics", "Trichy", "+91 98401 23456", "employer", 5000.0, 0.0, None, 100, 0, 0, 0, 0))
+    if user_count == 0:
+        cursor.execute("""
+            INSERT OR IGNORE INTO users (name, email, password, skills, location, phone, role, wallet_balance, secured_balance, rating, reliability_score, completed_jobs, late_arrivals, no_shows, is_online)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, ("Arun Kumar", "arun@gmail.com", pwd_hash, "Event Management, Photography, Logistics", "Trichy", "+91 98401 23456", "employer", 5000.0, 0.0, None, 100, 0, 0, 0, 0))
 
-    cursor.execute("""
-        INSERT OR IGNORE INTO users (name, email, password, skills, location, phone, role, wallet_balance, secured_balance, rating, reliability_score, completed_jobs, late_arrivals, no_shows, is_online)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, ("Rahul Sharma", "rahul@gmail.com", pwd_hash, "Data Entry, Delivery, Customer Support", "Chennai", "+91 97902 34567", "worker", 5000.0, 0.0, None, 100, 0, 0, 0, 0))
-
-    # Ensure phone numbers & roles exist even if users already existed
-    cursor.execute("UPDATE users SET phone = '+91 98401 23456', role = 'employer' WHERE email = 'arun@gmail.com'")
-    cursor.execute("UPDATE users SET phone = '+91 97902 34567', role = 'worker' WHERE email = 'rahul@gmail.com'")
+        cursor.execute("""
+            INSERT OR IGNORE INTO users (name, email, password, skills, location, phone, role, wallet_balance, secured_balance, rating, reliability_score, completed_jobs, late_arrivals, no_shows, is_online)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, ("Rahul Sharma", "rahul@gmail.com", pwd_hash, "Data Entry, Delivery, Customer Support", "Chennai", "+91 97902 34567", "worker", 5000.0, 0.0, None, 100, 0, 0, 0, 0))
 
     # Retrieve user ids
     cursor.execute("SELECT id, email FROM users WHERE email IN ('arun@gmail.com', 'rahul@gmail.com')")
@@ -67,7 +66,7 @@ def seed_database(conn=None):
     if arun_id and rahul_id:
         cursor.execute("UPDATE jobs SET poster_id = ? WHERE poster_id = ?", (arun_id, rahul_id))
 
-    today_str = (date.today() + timedelta(days=1)).strftime("%Y-%m-%d")
+    today_str = date.today().strftime("%Y-%m-%d")
 
     if job_count == 0 and arun_id:
         demo_jobs = [

@@ -17,12 +17,22 @@ def parse_time_or_dt(val, ref_date=None):
     
     if isinstance(val, str):
         val = val.strip()
-        # Try full ISO datetime format
-        for fmt in ("%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M"):
+        # Clean ISO representations (remove Z, timezone offset, and fractional seconds)
+        clean_val = val.replace('Z', '').split('+')[0]
+        if '.' in clean_val:
+            clean_val = clean_val.split('.')[0]
+
+        for fmt in (
+            "%Y-%m-%d %H:%M:%S",
+            "%Y-%m-%d %H:%M",
+            "%Y-%m-%dT%H:%M:%S",
+            "%Y-%m-%dT%H:%M"
+        ):
             try:
-                return datetime.strptime(val, fmt)
+                return datetime.strptime(clean_val, fmt)
             except ValueError:
                 pass
+
         # Try time format HH:MM:SS or HH:MM
         for fmt in ("%H:%M:%S", "%H:%M"):
             try:

@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import sys
 from contextlib import contextmanager
 
 # Path to database (handles Vercel /tmp writable directory)
@@ -7,9 +8,36 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(BASE_DIR, '..'))
 DATABASE_DIR = os.path.join(PROJECT_ROOT, 'database')
 
+if DATABASE_DIR not in sys.path:
+    sys.path.insert(0, DATABASE_DIR)
+
+def _load_env():
+    env_file = os.path.join(PROJECT_ROOT, '.env')
+    if os.path.exists(env_file):
+        try:
+            with open(env_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        k = k.strip()
+                        v = v.strip().strip('"').strip("'")
+                        if k not in os.environ:
+                            os.environ[k] = v
+        except Exception:
+            pass
+
+_load_env()
+
+try:
+    from turso_adapter import get_turso_connection
+except ImportError:
+    def get_turso_connection():
+        return None
+
 def get_db_path():
     # If running on Vercel or read-only lambda container, use writable /tmp
-    if os.environ.get('VERCEL') == '1' or not os.access(DATABASE_DIR, os.W_OK) if os.path.exists(DATABASE_DIR) else True:
+    if os.environ.get('VERCEL') == '1' or (os.path.exists(DATABASE_DIR) and not os.access(DATABASE_DIR, os.W_OK)):
         tmp_db = '/tmp/quickhire.db'
         orig_db = os.path.join(DATABASE_DIR, 'quickhire.db')
         if not os.path.exists(tmp_db) and os.path.exists(orig_db):
@@ -24,6 +52,9 @@ def get_db_path():
 DB_PATH = get_db_path()
 
 def get_db_connection():
+    turso_conn = get_turso_connection()
+    if turso_conn:
+        return turso_conn
     db_file = get_db_path()
     conn = sqlite3.connect(db_file)
     conn.row_factory = sqlite3.Row

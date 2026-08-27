@@ -1,12 +1,21 @@
 // QuickHire Interactive JavaScript Helper & Ultra-Fast Live Sync Engine
 
-// Safe cross-platform date parser for Mobile Safari, Chrome & Desktop
+// Safe cross-platform date parser for Mobile Safari, Chrome & Desktop (handles ISO, UTC, and SQL formats)
 function parseSafeDate(dateStr) {
   if (!dateStr) return null;
   if (dateStr instanceof Date) return dateStr;
   
+  const str = String(dateStr).trim();
+  
+  // 1. If ISO format with Z or timezone offset or T
+  if (str.endsWith('Z') || str.includes('+') || str.includes('T')) {
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  // 2. Standard SQL format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD HH:MM"
   try {
-    const clean = String(dateStr).trim().replace('T', ' ');
+    const clean = str.replace('T', ' ');
     const parts = clean.split(' ');
     if (parts.length >= 2) {
       const dateParts = parts[0].split('-').map(Number);
@@ -26,8 +35,8 @@ function parseSafeDate(dateStr) {
     console.error("Date parse error", e);
   }
 
-  const d = new Date(dateStr);
-  return isNaN(d.getTime()) ? null : d;
+  const fallback = new Date(str);
+  return isNaN(fallback.getTime()) ? null : fallback;
 }
 
 // 1. Live Job Digital Stopwatch with Auto-Stop on Target Completion (Worker View)
@@ -46,7 +55,9 @@ window.initLiveJobTimer = function(startTimeStr, prefix = 'worker', maxScheduled
 
   function tick() {
     const now = new Date();
-    const realDiffSecs = Math.max(0, Math.floor((now.getTime() - startDate.getTime()) / 1000));
+    // Handle small clock skew gracefully
+    const rawDiff = Math.floor((now.getTime() - startDate.getTime()) / 1000);
+    const realDiffSecs = Math.max(0, rawDiff);
     const scheduledSecs = parseFloat(maxScheduledSecs || (progressBarEl ? progressBarEl.dataset.scheduledSeconds : null) || 10800);
 
     // Stop timer when scheduled duration is reached
@@ -92,10 +103,18 @@ window.initLiveJobTimer = function(startTimeStr, prefix = 'worker', maxScheduled
         timeText = `${(displayDiffSecs / 3600).toFixed(2)} hrs worked`;
       }
 
-      const remainSecs = scheduledSecs - displayDiffSecs;
-      const remMins = Math.ceil(remainSecs / 60);
+      const remainSecs = Math.max(0, scheduledSecs - displayDiffSecs);
+      let remText = '';
+      if (remainSecs < 60) {
+        remText = `${remainSecs}s remaining`;
+      } else if (remainSecs < 3600) {
+        remText = `${Math.ceil(remainSecs / 60)}m remaining`;
+      } else {
+        remText = `${(remainSecs / 3600).toFixed(1)} hrs remaining`;
+      }
+
       if (elapsedTextEl) {
-        elapsedTextEl.innerHTML = `<i class="bi bi-stopwatch me-1 text-success"></i> <strong>${timeText}</strong> <span class="text-white-50">(${remMins}m remaining to full pay)</span>`;
+        elapsedTextEl.innerHTML = `<i class="bi bi-stopwatch me-1 text-success"></i> <strong>${timeText}</strong> <span class="text-white-50">(${remText} to full pay)</span>`;
       }
     }
   }
@@ -111,7 +130,7 @@ window.initBannerTimer = function(startTimeStr, elementId = 'global_banner_timer
   if (!startDate || !targetEl) return;
 
   // If already ended, show fixed static time and DO NOT tick
-  if (endTimeStr) {
+  if (endTimeStr && String(endTimeStr).trim() !== '') {
     const endDate = parseSafeDate(endTimeStr);
     if (endDate) {
       const fixedDiff = Math.max(0, Math.floor((endDate.getTime() - startDate.getTime()) / 1000));
@@ -127,7 +146,8 @@ window.initBannerTimer = function(startTimeStr, elementId = 'global_banner_timer
 
   function tickBanner() {
     const now = new Date();
-    const realDiffSecs = Math.max(0, Math.floor((now.getTime() - startDate.getTime()) / 1000));
+    const rawDiff = Math.floor((now.getTime() - startDate.getTime()) / 1000);
+    const realDiffSecs = Math.max(0, rawDiff);
     
     // Strict duration cap if maxScheduledSecs is set
     const scheduledSecs = maxScheduledSecs ? parseFloat(maxScheduledSecs) : null;
@@ -179,16 +199,15 @@ window.startLiveSync = function(jobId, initialAssignStatus, initialJobStatus, in
       }
 
       if (needsReload) {
-        // Immediate instant UI refresh across devices
         window.location.reload();
       }
     } catch (e) {
       // Ignore transient network glitches
     }
-  }, 800); // 800ms ultra-fast polling for instant reaction!
+  }, 800);
 };
 
-// 7. Toggle Password Visibility Eye Function
+// 4. Toggle Password Visibility Eye Function
 window.togglePasswordVisibility = function(inputId, btnEl) {
   const input = document.getElementById(inputId);
   if (!input) return;
@@ -202,13 +221,34 @@ window.togglePasswordVisibility = function(inputId, btnEl) {
   }
 };
 
+// Quick Timing Shift Setter for Post Job Form
+window.setShiftTiming = function(durationMinutes) {
+  const startInput = document.getElementById('start_time');
+  const endInput = document.getElementById('end_time');
+  if (!startInput || !endInput) return;
+
+  const now = new Date();
+  const startHH = String(now.getHours()).padStart(2, '0');
+  const startMM = String(now.getMinutes()).padStart(2, '0');
+  startInput.value = `${startHH}:${startMM}`;
+
+  const endDate = new Date(now.getTime() + durationMinutes * 60000);
+  const endHH = String(endDate.getHours()).padStart(2, '0');
+  const endMM = String(endDate.getMinutes()).padStart(2, '0');
+  endInput.value = `${endHH}:${endMM}`;
+
+  if (typeof updateDurationBadge === 'function') {
+    updateDurationBadge();
+  }
+};
+
 // DOM Content Loaded Handler
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialize Bootstrap tooltips
+  // Tooltips
   const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
   tooltipTriggerList.map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
-  // Auto-calculate total escrow on Post Job form
+  // Escrow math
   const paymentInput = document.getElementById('payment');
   const workersInput = document.getElementById('required_workers');
   const escrowDisplay = document.getElementById('totalEscrowDisplay');
@@ -235,17 +275,5 @@ document.addEventListener('DOMContentLoaded', () => {
     paymentInput.addEventListener('input', updateEscrowMath);
     workersInput.addEventListener('input', updateEscrowMath);
     updateEscrowMath();
-  }
-
-  // Auto-detect and initialize any banner timer
-  const bannerTimerEl = document.getElementById('global_banner_timer');
-  if (bannerTimerEl && bannerTimerEl.dataset.startTime) {
-    window.initBannerTimer(bannerTimerEl.dataset.startTime, 'global_banner_timer');
-  }
-
-  // Auto-detect and initialize job details timer
-  const workerTimerHrs = document.getElementById('worker_timer_hrs');
-  if (workerTimerHrs && workerTimerHrs.dataset.startTime) {
-    window.initLiveJobTimer(workerTimerHrs.dataset.startTime, 'worker');
   }
 });

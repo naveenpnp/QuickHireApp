@@ -21,20 +21,47 @@ def get_db_path():
 
 DB_PATH = get_db_path()
 
-if DB_DIR not in sys.path:
-    sys.path.insert(0, DB_DIR)
+def _load_env():
+    project_root = os.path.abspath(os.path.join(DB_DIR, '..'))
+    env_file = os.path.join(project_root, '.env')
+    if os.path.exists(env_file):
+        try:
+            with open(env_file, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        k = k.strip()
+                        v = v.strip().strip('"').strip("'")
+                        if k not in os.environ:
+                            os.environ[k] = v
+        except Exception:
+            pass
+
+_load_env()
+
+try:
+    from turso_adapter import get_turso_connection
+except ImportError:
+    def get_turso_connection():
+        return None
 
 from seed import seed_database
 
 def init_db(force=False):
-    db_file = get_db_path()
-    if force and os.path.exists(db_file):
-        try:
-            os.remove(db_file)
-        except Exception:
-            pass
+    turso_conn = get_turso_connection()
+    if turso_conn:
+        conn = turso_conn
+        print("Connected to Turso Cloud Database.")
+    else:
+        db_file = get_db_path()
+        if force and os.path.exists(db_file):
+            try:
+                os.remove(db_file)
+            except Exception:
+                pass
+        conn = sqlite3.connect(db_file)
 
-    conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
     # Check if tables already exist

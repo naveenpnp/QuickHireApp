@@ -28,11 +28,11 @@ def start_job(assignment_id):
         flash(f"Job is already in '{assignment['status']}' state.", "info")
         return redirect(url_for('job_routes.job_details', job_id=assignment['job_id']))
 
-    # Allow custom timestamp for simulation or default to current time
-    simulated_start = request.form.get('custom_start_time') if request.method == 'POST' else None
-    if simulated_start:
+    # Accept real-time client timestamp or default to server time
+    client_start = request.form.get('client_start_time') or request.form.get('custom_start_time')
+    if client_start:
         try:
-            start_dt = parse_time_or_dt(simulated_start, assignment['job_date'])
+            start_dt = parse_time_or_dt(client_start, assignment['job_date'])
         except Exception:
             start_dt = datetime.now()
     else:
@@ -92,11 +92,11 @@ def complete_job(assignment_id):
         flash("You must start the job before you can mark it as complete.", "warning")
         return redirect(url_for('job_routes.job_details', job_id=assignment['job_id']))
 
-    # Allow custom timestamp or simulation preset
-    simulated_end = request.form.get('custom_end_time') if request.method == 'POST' else None
-    if simulated_end:
+    # Accept real-time client timestamp or default to server time
+    client_end = request.form.get('client_end_time') or request.form.get('custom_end_time')
+    if client_end:
         try:
-            end_dt = parse_time_or_dt(simulated_end, assignment['job_date'])
+            end_dt = parse_time_or_dt(client_end, assignment['job_date'])
         except Exception:
             end_dt = datetime.now()
     else:
