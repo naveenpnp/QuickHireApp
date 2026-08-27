@@ -3,22 +3,22 @@
 {% block title %}QuickHire — Instant Local Work &amp; Hiring Platform{% endblock %}
 
 {% block content %}
-<!-- Ambient Hero Section -->
+<!-- Ambient Aurora Hero Section -->
 <section class="hero-section text-center">
-  <div class="container py-4 position-relative" style="z-index: 2;">
+  <div class="container py-3 py-md-4 position-relative" style="z-index: 2;">
     <div class="hero-badge mx-auto">
       <span class="online-dot pulsing"></span>
       <span>Hyperlocal Job Matching &bull; 100% Escrow Vault &bull; Live Work Stopwatch</span>
     </div>
     
-    <h1 class="display-3 fw-extrabold mb-3 text-white font-heading">
+    <h1 class="display-3 fw-extrabold mb-3 text-white font-heading" style="font-size: clamp(2rem, 5.5vw, 3.75rem);">
       Hire Fast. Work Today.<br>
-      <span style="background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #34d399 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      <span class="text-gradient-aurora">
         Get Paid Instantly.
       </span>
     </h1>
     
-    <p class="lead text-light mx-auto mb-4" style="max-width: 680px; opacity: 0.9; font-size: 1.15rem;">
+    <p class="lead text-light mx-auto mb-4 px-2" style="max-width: 680px; opacity: 0.92; font-size: clamp(1rem, 2.5vw, 1.2rem);">
       The premier platform for same-day local gigs and verified assistants. Guaranteed escrow payouts, automated shift hour calculation, and dynamic reliability scores.
     </p>
 
@@ -31,21 +31,21 @@
           </span>
           <input type="text" name="search" class="form-control" placeholder="Search gigs, skills, or city (e.g. Event, Data Entry, Trichy, Chennai)">
         </div>
-        <button type="submit" class="btn btn-primary px-4 py-2 w-100 w-md-auto fw-bold rounded-pill">
-          <i class="bi bi-arrow-right-circle me-1"></i> Search Gigs
+        <button type="submit" class="btn btn-primary px-4 py-2 w-100 w-md-auto fw-bold rounded-pill font-heading">
+          <i class="bi bi-arrow-right-circle-fill me-1"></i> Search Gigs
         </button>
       </form>
     </div>
 
     <!-- Quick Action Portals -->
     <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="{{ url_for('auth_routes.login', role='employer') }}" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm rounded-pill">
+      <a href="{{ url_for('auth_routes.login', role='employer') }}" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
         <i class="bi bi-building-fill me-1"></i> Employer Portal &rarr;
       </a>
-      <a href="{{ url_for('auth_routes.login', role='worker') }}" class="btn btn-success fw-bold px-4 py-2 shadow-sm rounded-pill">
+      <a href="{{ url_for('auth_routes.login', role='worker') }}" class="btn btn-success fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
         <i class="bi bi-person-workspace me-1"></i> Worker Portal &rarr;
       </a>
-      <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill">
+      <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill font-heading">
         <i class="bi bi-grid-3x3-gap-fill me-1"></i> Browse Open Jobs
       </a>
     </div>
@@ -53,28 +53,28 @@
 </section>
 
 <!-- Main Content Area -->
-<div class="container py-5">
+<div class="container py-4 py-md-5">
   
-  <!-- Category Quick Filters -->
+  <!-- Category Quick Filters (Horizontal Pill Carousel) -->
   <div class="mb-5 text-center">
-    <div class="d-flex gap-2 justify-content-center flex-wrap">
-      <a href="{{ url_for('job_routes.jobs') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill">
+    <div class="d-flex gap-2 justify-content-start justify-content-md-center flex-nowrap flex-md-wrap overflow-auto pb-2 text-nowrap px-1">
+      <a href="{{ url_for('job_routes.jobs') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
         <i class="bi bi-stars text-warning me-1"></i> All Categories
       </a>
-      <a href="{{ url_for('job_routes.jobs', category='Event Work') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill">
-        <i class="bi bi-calendar-event text-primary me-1"></i> Event Work
+      <a href="{{ url_for('job_routes.jobs', category='Event Work') }}" class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
+        <i class="bi bi-calendar-event-fill me-1"></i> Event Work
       </a>
-      <a href="{{ url_for('job_routes.jobs', category='Delivery') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill">
-        <i class="bi bi-truck text-info me-1"></i> Delivery
+      <a href="{{ url_for('job_routes.jobs', category='Delivery') }}" class="badge bg-info-subtle text-info-emphasis border border-info-subtle px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
+        <i class="bi bi-truck-flatbed me-1"></i> Delivery
       </a>
-      <a href="{{ url_for('job_routes.jobs', category='Data Entry') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill">
-        <i class="bi bi-laptop text-success me-1"></i> Data Entry
+      <a href="{{ url_for('job_routes.jobs', category='Data Entry') }}" class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
+        <i class="bi bi-laptop-fill me-1"></i> Data Entry
       </a>
-      <a href="{{ url_for('job_routes.jobs', category='Shop Assistant') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill">
-        <i class="bi bi-shop text-danger me-1"></i> Shop Assistant
+      <a href="{{ url_for('job_routes.jobs', category='Shop Assistant') }}" class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
+        <i class="bi bi-shop-window me-1"></i> Shop Assistant
       </a>
-      <a href="{{ url_for('job_routes.jobs', category='Photography Assistant') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill">
-        <i class="bi bi-camera text-primary me-1"></i> Photography
+      <a href="{{ url_for('job_routes.jobs', category='Photography Assistant') }}" class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
+        <i class="bi bi-camera-fill me-1"></i> Photography
       </a>
     </div>
   </div>
@@ -82,26 +82,26 @@
   <!-- Urgent Jobs Section -->
   {% if urgent_jobs %}
   <div class="mb-5">
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
       <div class="d-flex align-items-center gap-2">
         <span class="badge badge-urgent">
           <i class="bi bi-lightning-fill"></i> URGENT GIGS
         </span>
         <h3 class="fw-bold m-0 font-heading fs-4 text-dark">Immediate Shift Openings Today</h3>
       </div>
-      <a href="{{ url_for('job_routes.jobs', urgent='1') }}" class="text-primary fw-bold text-decoration-none small">
+      <a href="{{ url_for('job_routes.jobs', urgent='1') }}" class="text-danger fw-bold text-decoration-none small font-heading">
         View All Urgent &rarr;
       </a>
     </div>
 
     <div class="row g-4">
       {% for job in urgent_jobs %}
-      <div class="col-md-4">
-        <div class="card card-custom card-interactive h-100 position-relative border-danger-subtle shadow-sm" style="border-left: 4px solid #ef4444;">
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-custom card-interactive h-100 position-relative border-danger-subtle shadow-sm bg-white" style="border-left: 5px solid #ef4444;">
           <div class="card-body d-flex flex-column p-4">
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill fw-bold">
-                <i class="bi bi-fire me-1"></i> Urgent
+              <span class="badge bg-danger text-white rounded-pill fw-bold small">
+                <i class="bi bi-fire me-1"></i> URGENT
               </span>
               <span class="fs-4 fw-extrabold text-success font-heading">₹{{ "%.0f"|format(job.payment) }}</span>
             </div>
@@ -113,8 +113,8 @@
             </h5>
             
             <div class="text-muted small mb-3">
-              <span class="me-2"><i class="bi bi-geo-alt text-danger me-1"></i>{{ job.location }}</span>
-              <span><i class="bi bi-clock text-primary me-1"></i>{{ job.start_time }} - {{ job.end_time }}</span>
+              <span class="me-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ job.location }}</span>
+              <span><i class="bi bi-clock-fill text-primary me-1"></i>{{ job.start_time }} - {{ job.end_time }}</span>
             </div>
             
             <p class="card-text text-muted small flex-grow-1" style="line-height: 1.6;">
@@ -125,7 +125,7 @@
               <span class="badge bg-light text-dark border rounded-pill small">
                 <i class="bi bi-people-fill me-1 text-muted"></i>{{ job.required_workers }} helper needed
               </span>
-              <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3">
+              <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-sm btn-outline-danger fw-bold rounded-pill px-3 font-heading">
                 Apply Now &rarr;
               </a>
             </div>
@@ -138,46 +138,46 @@
   {% endif %}
 
   <!-- How QuickHire Works: 3-Step Interactive Cards -->
-  <div class="my-5 py-4">
+  <div class="my-5 py-3 py-md-4">
     <div class="text-center mb-5">
-      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold small text-uppercase mb-2">
+      <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-bold small text-uppercase mb-2 font-heading">
         Platform Architecture
       </span>
-      <h2 class="fw-bold font-heading text-dark">How QuickHire Protects Work &amp; Pay</h2>
-      <p class="text-muted small mx-auto" style="max-width: 500px;">
+      <h2 class="fw-bold font-heading text-dark" style="font-size: clamp(1.75rem, 3.5vw, 2.5rem);">How QuickHire Protects Work &amp; Pay</h2>
+      <p class="text-muted small mx-auto" style="max-width: 540px;">
         Designed for trust, speed, and fairness with automated escrow and digital tracking.
       </p>
     </div>
 
     <div class="row g-4">
       <div class="col-md-4">
-        <div class="card card-custom p-4 h-100 text-center">
-          <div class="stat-icon bg-primary-subtle text-primary mb-3 mx-auto shadow-sm">
+        <div class="card card-custom p-4 h-100 text-center bg-white shadow-xs" style="border-top: 4px solid #4f46e5;">
+          <div class="stat-icon bg-primary-subtle text-primary mb-3 mx-auto shadow-xs" style="width: 58px; height: 58px; font-size: 1.7rem;">
             <i class="bi bi-shield-lock-fill"></i>
           </div>
-          <div class="badge bg-primary text-white mx-auto rounded-pill px-3 py-1 mb-2">STEP 1</div>
+          <div class="badge bg-primary text-white mx-auto rounded-pill px-3 py-1 mb-2 font-heading">STEP 1</div>
           <h5 class="fw-bold font-heading text-dark">Escrow Vault Deposit</h5>
-          <p class="text-muted small m-0">When a job is posted, payout funds are immediately locked into the QuickHire Escrow Vault so workers have 100% pay guarantee.</p>
+          <p class="text-muted small m-0" style="line-height: 1.6;">When a job is posted, payout funds are immediately locked into the QuickHire Escrow Vault so workers have 100% pay guarantee.</p>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card card-custom p-4 h-100 text-center">
-          <div class="stat-icon bg-info-subtle text-info mb-3 mx-auto shadow-sm">
+        <div class="card card-custom p-4 h-100 text-center bg-white shadow-xs" style="border-top: 4px solid #06b6d4;">
+          <div class="stat-icon bg-info-subtle text-info mb-3 mx-auto shadow-xs" style="width: 58px; height: 58px; font-size: 1.7rem;">
             <i class="bi bi-stopwatch-fill"></i>
           </div>
-          <div class="badge bg-info text-dark mx-auto rounded-pill px-3 py-1 mb-2">STEP 2</div>
+          <div class="badge bg-info text-dark mx-auto rounded-pill px-3 py-1 mb-2 font-heading">STEP 2</div>
           <h5 class="fw-bold font-heading text-dark">Live Work Stopwatch</h5>
-          <p class="text-muted small m-0">Workers clock in on their device. Our digital stopwatch accurately tracks on-time start, elapsed hours, and handles late arrivals seamlessly.</p>
+          <p class="text-muted small m-0" style="line-height: 1.6;">Workers clock in on their device. Our digital stopwatch accurately tracks on-time start, elapsed hours, and handles late arrivals seamlessly.</p>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card card-custom p-4 h-100 text-center">
-          <div class="stat-icon bg-success-subtle text-success mb-3 mx-auto shadow-sm">
+        <div class="card card-custom p-4 h-100 text-center bg-white shadow-xs" style="border-top: 4px solid #10b981;">
+          <div class="stat-icon bg-success-subtle text-success mb-3 mx-auto shadow-xs" style="width: 58px; height: 58px; font-size: 1.7rem;">
             <i class="bi bi-wallet-fill"></i>
           </div>
-          <div class="badge bg-success text-white mx-auto rounded-pill px-3 py-1 mb-2">STEP 3</div>
+          <div class="badge bg-success text-white mx-auto rounded-pill px-3 py-1 mb-2 font-heading">STEP 3</div>
           <h5 class="fw-bold font-heading text-dark">Instant Release Payout</h5>
-          <p class="text-muted small m-0">Once shift completion is submitted and verified, earnings transfer instantly into the worker's wallet with zero delays or gateways.</p>
+          <p class="text-muted small m-0" style="line-height: 1.6;">Once shift completion is submitted and verified, earnings transfer instantly into the worker's wallet with zero delays or gateways.</p>
         </div>
       </div>
     </div>
@@ -190,18 +190,18 @@
         <h3 class="fw-bold m-0 font-heading text-dark">Latest Available Gigs</h3>
         <div class="text-muted small">Explore recent same-day gigs and open positions</div>
       </div>
-      <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-primary btn-sm fw-bold rounded-pill px-3">
+      <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-primary btn-sm fw-bold rounded-pill px-3 font-heading">
         Browse All {{ recent_jobs|length }}+ Gigs &rarr;
       </a>
     </div>
 
     <div class="row g-4">
       {% for job in recent_jobs %}
-      <div class="col-md-4">
-        <div class="card card-custom card-interactive h-100 shadow-xs">
+      <div class="col-md-6 col-lg-4">
+        <div class="card card-custom card-interactive h-100 shadow-xs bg-white">
           <div class="card-body d-flex flex-column p-4">
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill font-heading">
                 {{ job.category }}
               </span>
               <span class="fs-4 fw-extrabold text-success font-heading">₹{{ "%.0f"|format(job.payment) }}</span>
@@ -214,7 +214,7 @@
             </h5>
             
             <div class="text-muted small mb-3">
-              <span class="me-2"><i class="bi bi-geo-alt text-danger me-1"></i>{{ job.location }}</span>
+              <span class="me-2"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ job.location }}</span>
               <span><i class="bi bi-calendar-event text-muted me-1"></i>{{ job.job_date }}</span>
             </div>
             
@@ -224,12 +224,12 @@
             
             <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
               <div class="d-flex align-items-center gap-2">
-                <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 11px;">
+                <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center font-heading" style="width: 30px; height: 30px; font-size: 11px;">
                   {{ job.poster_name[0] }}
                 </div>
                 <span class="small text-dark fw-semibold">{{ job.poster_name }}</span>
               </div>
-              <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-sm btn-primary rounded-pill px-3">
+              <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-sm btn-primary rounded-pill px-3 font-heading">
                 Details &rarr;
               </a>
             </div>

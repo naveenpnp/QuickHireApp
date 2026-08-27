@@ -27,9 +27,18 @@
         <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="QuickHire Logo" class="brand-logo">
       </a>
       
-      <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="bi bi-list fs-2 text-dark"></i>
-      </button>
+      <div class="d-flex align-items-center gap-2 d-lg-none">
+        {% if current_user %}
+          <!-- Mobile Wallet Quick Pill -->
+          <a href="{{ url_for('wallet_routes.wallet') }}" class="btn btn-sm btn-light border d-flex align-items-center gap-1 shadow-xs text-decoration-none rounded-pill px-2 py-1" title="Wallet">
+            <i class="bi bi-wallet2 text-primary"></i>
+            <span class="fw-bold text-dark small font-heading">₹{{ "%.0f"|format(current_user.wallet_balance) }}</span>
+          </a>
+        {% endif %}
+        <button class="navbar-toggler border-0 shadow-none p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+          <i class="bi bi-list fs-2 text-dark"></i>
+        </button>
+      </div>
 
       <div class="collapse navbar-collapse" id="navbarContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-3 gap-1">
@@ -89,7 +98,7 @@
         <div class="d-flex align-items-center gap-2">
           {% if current_user %}
             <!-- Messages Quick Icon -->
-            <a href="{{ url_for('message_routes.inbox') }}" class="btn btn-sm btn-light border shadow-sm text-decoration-none rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Messages & Contacts">
+            <a href="{{ url_for('message_routes.inbox') }}" class="btn btn-sm btn-light border shadow-sm text-decoration-none rounded-circle d-flex align-items-center justify-content-center d-none d-md-flex" style="width: 38px; height: 38px;" title="Messages & Contacts">
               <i class="bi bi-chat-dots-fill text-primary"></i>
             </a>
 
@@ -99,8 +108,8 @@
               <span class="fw-bold">{{ 'Employer' if current_role == 'employer' else 'Worker' }}</span>
             </span>
 
-            <!-- Wallet Pill -->
-            <a href="{{ url_for('wallet_routes.wallet') }}" class="btn btn-sm btn-light border d-flex align-items-center gap-2 shadow-sm text-decoration-none rounded-pill px-3 py-1" title="Wallet Balance">
+            <!-- Wallet Pill (Desktop) -->
+            <a href="{{ url_for('wallet_routes.wallet') }}" class="btn btn-sm btn-light border d-none d-md-flex align-items-center gap-2 shadow-sm text-decoration-none rounded-pill px-3 py-1" title="Wallet Balance">
               <i class="bi bi-wallet2 text-primary"></i>
               <span class="fw-bold text-dark font-heading">₹{{ "%.2f"|format(current_user.wallet_balance) }}</span>
               {% if current_role == 'employer' and current_user.secured_balance > 0 %}
@@ -274,6 +283,49 @@
       </div>
     </div>
   </footer>
+
+  <!-- App-Like Mobile Floating Bottom Navigation (Visible on phones & tablets < 768px) -->
+  <div class="mobile-bottom-nav d-md-none">
+    <a href="{{ url_for('main_routes.index') if not current_user else url_for('main_routes.dashboard') }}" class="mobile-nav-item">
+      <i class="bi bi-house-door-fill"></i>
+      <span>Home</span>
+    </a>
+    <a href="{{ url_for('job_routes.jobs') }}" class="mobile-nav-item">
+      <i class="bi bi-grid-fill"></i>
+      <span>Gigs</span>
+    </a>
+    {% if current_user and current_role == 'employer' %}
+      <a href="{{ url_for('job_routes.post_job') }}" class="mobile-nav-item text-primary">
+        <i class="bi bi-plus-circle-fill fs-3" style="margin-top: -6px;"></i>
+        <span>Post</span>
+      </a>
+    {% elif current_user and current_role == 'worker' %}
+      <a href="{{ url_for('application_routes.applications') }}" class="mobile-nav-item text-success">
+        <i class="bi bi-file-earmark-check-fill"></i>
+        <span>Applied</span>
+      </a>
+    {% else %}
+      <a href="{{ url_for('auth_routes.register') }}" class="mobile-nav-item text-primary">
+        <i class="bi bi-person-plus-fill"></i>
+        <span>Register</span>
+      </a>
+    {% endif %}
+    {% if current_user %}
+      <a href="{{ url_for('message_routes.inbox') }}" class="mobile-nav-item">
+        <i class="bi bi-chat-dots-fill"></i>
+        <span>Chat</span>
+      </a>
+      <a href="{{ url_for('wallet_routes.wallet') }}" class="mobile-nav-item">
+        <i class="bi bi-wallet2"></i>
+        <span>Wallet</span>
+      </a>
+    {% else %}
+      <a href="{{ url_for('auth_routes.login') }}" class="mobile-nav-item">
+        <i class="bi bi-box-arrow-in-right"></i>
+        <span>Login</span>
+      </a>
+    {% endif %}
+  </div>
 
   <!-- Bootstrap 5 JS Bundle CDN -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
