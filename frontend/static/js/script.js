@@ -216,10 +216,127 @@ window.togglePasswordVisibility = function(inputId, btnEl) {
   if (btnEl) {
     const icon = btnEl.querySelector('i');
     if (icon) {
-      icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
+      icon.className = isPass ? 'bi bi-eye-slash text-primary' : 'bi bi-eye text-muted';
     }
   }
 };
+
+// 5. Real-Time Password Strength Evaluator & Live Rule Checklist
+window.checkPasswordStrength = function(inputId = 'password', meterPrefix = 'pwd') {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const val = input.value || '';
+
+  const barEl = document.getElementById(`${meterPrefix}_strength_bar`);
+  const textEl = document.getElementById(`${meterPrefix}_strength_text`);
+  const ruleLength = document.getElementById(`${meterPrefix}_rule_length`);
+  const ruleUpper = document.getElementById(`${meterPrefix}_rule_upper`);
+  const ruleLower = document.getElementById(`${meterPrefix}_rule_lower`);
+  const ruleNumber = document.getElementById(`${meterPrefix}_rule_number`);
+  const ruleSpecial = document.getElementById(`${meterPrefix}_rule_special`);
+
+  const hasLength = val.length >= 8;
+  const hasUpper = /[A-Z]/.test(val);
+  const hasLower = /[a-z]/.test(val);
+  const hasNumber = /[0-9]/.test(val);
+  const hasSpecial = /[!@#$%^&*(),.?":{}|<>\-_=+/\\~`\[\]]/.test(val);
+
+  function updateRule(el, valid) {
+    if (!el) return;
+    const icon = el.querySelector('i');
+    if (valid) {
+      el.classList.remove('text-muted', 'text-danger');
+      el.classList.add('text-success', 'fw-semibold');
+      if (icon) icon.className = 'bi bi-check-circle-fill me-1 text-success';
+    } else {
+      el.classList.remove('text-success', 'fw-semibold');
+      el.classList.add('text-muted');
+      if (icon) icon.className = 'bi bi-circle me-1 text-muted';
+    }
+  }
+
+  updateRule(ruleLength, hasLength);
+  updateRule(ruleUpper, hasUpper);
+  updateRule(ruleLower, hasLower);
+  updateRule(ruleNumber, hasNumber);
+  updateRule(ruleSpecial, hasSpecial);
+
+  let score = 0;
+  if (hasLength) score += 1;
+  if (hasUpper) score += 1;
+  if (hasLower) score += 1;
+  if (hasNumber) score += 1;
+  if (hasSpecial) score += 1;
+
+  if (val.length === 0) {
+    if (barEl) {
+      barEl.style.width = '0%';
+      barEl.className = 'progress-bar';
+    }
+    if (textEl) {
+      textEl.textContent = '';
+      textEl.className = 'small text-muted';
+    }
+    return;
+  }
+
+  if (score <= 2) {
+    if (barEl) {
+      barEl.style.width = '25%';
+      barEl.className = 'progress-bar bg-danger';
+    }
+    if (textEl) {
+      textEl.innerHTML = '<i class="bi bi-shield-x me-1"></i> Weak Password';
+      textEl.className = 'small fw-bold text-danger';
+    }
+  } else if (score === 3 || score === 4) {
+    if (barEl) {
+      barEl.style.width = score === 3 ? '55%' : '75%';
+      barEl.className = 'progress-bar bg-warning';
+    }
+    if (textEl) {
+      textEl.innerHTML = `<i class="bi bi-shield-exclamation me-1"></i> ${score === 3 ? 'Fair Password' : 'Good Password'}`;
+      textEl.className = 'small fw-bold text-warning';
+    }
+  } else if (score === 5) {
+    if (barEl) {
+      barEl.style.width = '100%';
+      barEl.className = 'progress-bar bg-success';
+    }
+    if (textEl) {
+      textEl.innerHTML = '<i class="bi bi-shield-check me-1"></i> Strong & Secure Password';
+      textEl.className = 'small fw-bold text-success';
+    }
+  }
+
+  // Also check confirm password match if available
+  if (typeof checkPasswordMatch === 'function') {
+    checkPasswordMatch(inputId, inputId === 'new_password' ? 'confirm_password' : 'confirm_password');
+  }
+};
+
+window.checkPasswordMatch = function(pwdId = 'password', confirmId = 'confirm_password', matchMsgId = 'pwd_match_msg') {
+  const pwdInput = document.getElementById(pwdId);
+  const confirmInput = document.getElementById(confirmId);
+  const msgEl = document.getElementById(matchMsgId);
+
+  if (!pwdInput || !confirmInput || !msgEl) return;
+
+  const p1 = pwdInput.value;
+  const p2 = confirmInput.value;
+
+  if (!p2) {
+    msgEl.innerHTML = '';
+    return;
+  }
+
+  if (p1 === p2) {
+    msgEl.innerHTML = '<span class="text-success small fw-semibold"><i class="bi bi-check-circle-fill me-1"></i> Passwords match perfectly</span>';
+  } else {
+    msgEl.innerHTML = '<span class="text-danger small fw-semibold"><i class="bi bi-x-circle-fill me-1"></i> Passwords do not match</span>';
+  }
+};
+
 
 // Quick Timing Shift Setter for Post Job Form
 window.setShiftTiming = function(durationMinutes) {

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from models import UserModel
-from services.auth_service import login_user, logout_user, hash_password, verify_password
+from services.auth_service import login_user, logout_user, hash_password, verify_password, validate_strong_password
 
 auth_bp = Blueprint('auth_routes', __name__)
 
@@ -15,6 +15,7 @@ def register():
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
         location = request.form.get('location', '').strip()
         skills = request.form.get('skills', '').strip()
         phone = request.form.get('phone', '').strip()
@@ -22,6 +23,17 @@ def register():
 
         if not name or not email or not password:
             flash("Please fill in all required fields (Name, Email, Password).", "danger")
+            return render_template('register.html', name=name, email=email, location=location, skills=skills, phone=phone, selected_role=role)
+
+        # Check confirm password if provided
+        if confirm_password and password != confirm_password:
+            flash("Passwords do not match. Please re-enter your password.", "warning")
+            return render_template('register.html', name=name, email=email, location=location, skills=skills, phone=phone, selected_role=role)
+
+        # Enforce strong password policy
+        is_strong, pwd_err = validate_strong_password(password)
+        if not is_strong:
+            flash(pwd_err, "danger")
             return render_template('register.html', name=name, email=email, location=location, skills=skills, phone=phone, selected_role=role)
 
         existing_user = UserModel.get_by_email(email)
@@ -98,6 +110,11 @@ def forgot_password():
 
         if new_password != confirm_password:
             flash("Passwords do not match. Please ensure both fields are identical.", "warning")
+            return render_template('forgot_password.html', email=email)
+
+        is_strong, pwd_err = validate_strong_password(new_password)
+        if not is_strong:
+            flash(pwd_err, "danger")
             return render_template('forgot_password.html', email=email)
 
         pwd_hash = hash_password(new_password)
