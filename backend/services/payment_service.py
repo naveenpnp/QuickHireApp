@@ -22,19 +22,22 @@ def parse_time_or_dt(val, ref_date=None):
         if '.' in clean_val:
             clean_val = clean_val.split('.')[0]
 
+        # Try full datetime formats
         for fmt in (
             "%Y-%m-%d %H:%M:%S",
             "%Y-%m-%d %H:%M",
             "%Y-%m-%dT%H:%M:%S",
-            "%Y-%m-%dT%H:%M"
+            "%Y-%m-%dT%H:%M",
+            "%Y-%m-%d %I:%M %p",
+            "%Y-%m-%d %I:%M:%S %p"
         ):
             try:
                 return datetime.strptime(clean_val, fmt)
             except ValueError:
                 pass
 
-        # Try time format HH:MM:SS or HH:MM
-        for fmt in ("%H:%M:%S", "%H:%M"):
+        # Try 12-hour AM/PM and 24-hour time formats
+        for fmt in ("%I:%M %p", "%I:%M:%S %p", "%I:%M%p", "%I:%M:%S%p", "%H:%M:%S", "%H:%M"):
             try:
                 t = datetime.strptime(val, fmt).time()
                 return datetime.combine(ref_date, t)
