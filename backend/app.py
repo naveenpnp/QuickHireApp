@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, send_from_directory
 
 # Add backend directory and database directory to sys.path
 BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -34,9 +34,16 @@ def create_app():
     app = Flask(
         __name__,
         template_folder=os.path.join(PROJECT_ROOT, 'frontend', 'templates'),
-        static_folder=os.path.join(PROJECT_ROOT, 'frontend', 'static')
+        static_folder=os.path.join(PROJECT_ROOT, 'frontend', 'static'),
+        static_url_path='/static'
     )
     app.secret_key = os.environ.get('SECRET_KEY', 'quickhire-super-secret-key-2026')
+
+    # Explicit static route for Vercel Serverless
+    @app.route('/static/<path:filename>')
+    def serve_static_files(filename):
+        static_dir = os.path.join(PROJECT_ROOT, 'frontend', 'static')
+        return send_from_directory(static_dir, filename)
 
     # Register Blueprints
     app.register_blueprint(main_bp)
@@ -90,18 +97,4 @@ def create_app():
 app = create_app()
 
 if __name__ == '__main__':
-    import socket
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
-    except Exception:
-        local_ip = "127.0.0.1"
-
-    print("==================================================")
-    print(">>> QuickHire Web Application is LIVE!")
-    print(f">>> Local PC Access:    http://127.0.0.1:5000")
-    print(f">>> Same Wi-Fi / Phone: http://{local_ip}:5000")
-    print("==================================================")
     app.run(host='0.0.0.0', port=5000, debug=True)
