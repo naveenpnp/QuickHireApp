@@ -11,25 +11,29 @@
     <!-- ========================================== -->
     
     <!-- Welcome Banner (Employer) -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 p-4 bg-white rounded-3 shadow-sm border border-primary-subtle">
-      <div>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-primary px-2 py-1"><i class="bi bi-building me-1"></i> Employer Portal</span>
-          <h2 class="fw-extrabold m-0">Hi, {{ user.name }}</h2>
-          <span class="online-dot pulsing" title="Online Status: Active"></span>
+    <div class="card card-custom p-4 mb-4 shadow-sm border-primary-subtle" style="background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-bold">
+              <i class="bi bi-building me-1"></i> Employer Portal
+            </span>
+            <span class="online-dot pulsing" title="Active Connection"></span>
+          </div>
+          <h2 class="fw-extrabold m-0 font-heading text-dark">Welcome back, {{ user.name }}</h2>
+          <p class="text-muted m-0 small mt-1">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ user.location or 'City location not set' }} &bull; 
+            Manage active job postings, hire helpers, and release escrow payouts.
+          </p>
         </div>
-        <p class="text-muted m-0 small mt-1">
-          <i class="bi bi-geo-alt me-1 text-danger"></i>{{ user.location or 'Location not set' }} &bull; 
-          Manage your gig postings, review applicants, and release escrow payments.
-        </p>
-      </div>
-      <div class="d-flex gap-2">
-        <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold shadow-sm d-flex align-items-center gap-1">
-          <i class="bi bi-plus-lg"></i> Post New Job
-        </a>
-        <a href="{{ url_for('job_routes.my_jobs', tab='posted') }}" class="btn btn-outline-primary fw-bold">
-          <i class="bi bi-megaphone me-1"></i> My Postings
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold shadow-sm rounded-pill px-4">
+            <i class="bi bi-plus-lg"></i> Post New Job
+          </a>
+          <a href="{{ url_for('job_routes.my_jobs', tab='posted') }}" class="btn btn-outline-primary fw-bold rounded-pill px-3">
+            <i class="bi bi-megaphone me-1"></i> My Postings
+          </a>
+        </div>
       </div>
     </div>
 
@@ -38,12 +42,12 @@
       <!-- Escrow Secured Balance -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-warning-subtle text-warning-emphasis">
-            <i class="bi bi-shield-lock"></i>
+          <div class="stat-icon bg-warning-subtle text-warning-emphasis shadow-xs">
+            <i class="bi bi-shield-lock-fill"></i>
           </div>
           <div>
-            <div class="text-muted small fw-semibold">Escrow Locked</div>
-            <div class="fs-4 fw-bold text-warning-emphasis">₹{{ "%.2f"|format(user.secured_balance) }}</div>
+            <div class="text-muted small fw-semibold">Escrow Vault</div>
+            <div class="fs-4 fw-extrabold text-warning-emphasis font-heading">₹{{ "%.2f"|format(user.secured_balance) }}</div>
           </div>
         </div>
       </div>
@@ -51,12 +55,12 @@
       <!-- Available Wallet -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-success-subtle text-success">
+          <div class="stat-icon bg-success-subtle text-success shadow-xs">
             <i class="bi bi-wallet2"></i>
           </div>
           <div>
             <div class="text-muted small fw-semibold">Wallet Balance</div>
-            <div class="fs-4 fw-bold text-success">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
+            <div class="fs-4 fw-extrabold text-success font-heading">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
           </div>
         </div>
       </div>
@@ -64,12 +68,12 @@
       <!-- Active Jobs Posted -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-primary-subtle text-primary">
-            <i class="bi bi-briefcase"></i>
+          <div class="stat-icon bg-primary-subtle text-primary shadow-xs">
+            <i class="bi bi-briefcase-fill"></i>
           </div>
           <div>
             <div class="text-muted small fw-semibold">Jobs Posted</div>
-            <div class="fs-4 fw-bold text-primary">{{ posted_count }}</div>
+            <div class="fs-4 fw-extrabold text-primary font-heading">{{ posted_count }}</div>
           </div>
         </div>
       </div>
@@ -77,12 +81,12 @@
       <!-- Employer Rating -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-info-subtle text-info">
-            <i class="bi bi-star"></i>
+          <div class="stat-icon bg-info-subtle text-info shadow-xs">
+            <i class="bi bi-star-fill"></i>
           </div>
           <div>
             <div class="text-muted small fw-semibold">Employer Rating</div>
-            <div class="fs-4 fw-bold text-dark">
+            <div class="fs-4 fw-extrabold text-dark font-heading">
               {% if user.rating %}
                 <span class="star-rating"><i class="bi bi-star-fill"></i> {{ "%.1f"|format(user.rating) }}</span>
               {% else %}
@@ -94,49 +98,49 @@
       </div>
     </div>
 
-    <!-- 1. Urgent Employer Action: Pending Confirmations -->
+    <!-- Urgent Employer Action: Pending Confirmations -->
     {% if pending_confirmations %}
-    <div class="card card-custom border-warning mb-4 shadow-sm">
-      <div class="card-header bg-warning-subtle border-warning d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold m-0 text-warning-emphasis">
-          <i class="bi bi-bell-fill me-2"></i> Work Completed — Confirm &amp; Release Payment
+    <div class="card card-custom border-warning mb-4 shadow-sm" style="border-left: 5px solid #f59e0b;">
+      <div class="card-header bg-warning-subtle border-warning d-flex justify-content-between align-items-center py-3">
+        <h5 class="fw-bold m-0 text-warning-emphasis font-heading d-flex align-items-center gap-2">
+          <i class="bi bi-bell-fill text-warning"></i> Work Completed — Confirm &amp; Release Payment
         </h5>
-        <span class="badge bg-warning text-dark fw-bold">{{ pending_confirmations|length }} Awaiting Confirmation</span>
+        <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1">{{ pending_confirmations|length }} Action Required</span>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover align-middle m-0">
-            <thead class="table-light small">
+            <thead class="table-light small text-muted">
               <tr>
-                <th>Job Title</th>
+                <th class="ps-4">Job Title</th>
                 <th>Worker</th>
-                <th>Work Hours</th>
-                <th>Calculated Payment</th>
-                <th>Action</th>
+                <th>Work Hours Tracked</th>
+                <th>Calculated Payout</th>
+                <th class="pe-4 text-end">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for item in pending_confirmations %}
               <tr>
-                <td class="fw-bold">{{ item.job_title }}</td>
+                <td class="ps-4 fw-bold font-heading text-dark">{{ item.job_title }}</td>
                 <td>
-                  <div>{{ item.worker_name }}</div>
+                  <div class="fw-semibold text-dark">{{ item.worker_name }}</div>
                   <span class="badge bg-primary-subtle text-primary rounded-pill small">{{ item.worker_reliability }}% reliability</span>
                 </td>
                 <td>
-                  <div><strong>{{ item.actual_hours }}</strong> hrs actual (Scheduled: {{ item.scheduled_hours or 'N/A' }} hrs)</div>
+                  <div class="small"><strong>{{ item.actual_hours }}</strong> hrs actual (Scheduled: {{ item.scheduled_hours or 'N/A' }}h)</div>
                   {% if item.late %}
-                    <span class="badge bg-danger-subtle text-danger">Late Arrival</span>
+                    <span class="badge bg-danger-subtle text-danger rounded-pill">Late Arrival</span>
                   {% else %}
-                    <span class="badge bg-success-subtle text-success">On Time</span>
+                    <span class="badge bg-success-subtle text-success rounded-pill">On Time</span>
                   {% endif %}
                 </td>
                 <td>
-                  <span class="fs-5 fw-bold text-success">₹{{ "%.2f"|format(item.calculated_payment) }}</span>
+                  <span class="fs-5 fw-extrabold text-success font-heading">₹{{ "%.2f"|format(item.calculated_payment) }}</span>
                 </td>
-                <td>
-                  <a href="{{ url_for('job_routes.job_details', job_id=item.job_id) }}" class="btn btn-sm btn-success fw-bold">
-                    <i class="bi bi-check-circle me-1"></i> Review &amp; Confirm
+                <td class="pe-4 text-end">
+                  <a href="{{ url_for('job_routes.job_details', job_id=item.job_id) }}" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-sm">
+                    <i class="bi bi-check-circle-fill me-1"></i> Release Payment
                   </a>
                 </td>
               </tr>
@@ -148,34 +152,34 @@
     </div>
     {% endif %}
 
-    <!-- 2. Employer Active Jobs & Applicant Management -->
+    <!-- Employer Active Jobs & Applicant Management -->
     <div class="row g-4">
       <div class="col-lg-8">
         <div class="card card-custom h-100 shadow-sm">
-          <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <h5 class="fw-bold m-0"><i class="bi bi-megaphone text-primary me-2"></i>Your Posted Jobs</h5>
-            <a href="{{ url_for('job_routes.my_jobs', tab='posted') }}" class="small fw-semibold text-decoration-none">View All ({{ posted_count }}) &rarr;</a>
+          <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+            <h5 class="fw-bold m-0 font-heading text-dark"><i class="bi bi-megaphone-fill text-primary me-2"></i>Your Posted Jobs</h5>
+            <a href="{{ url_for('job_routes.my_jobs', tab='posted') }}" class="small fw-bold text-primary text-decoration-none">View All ({{ posted_count }}) &rarr;</a>
           </div>
           <div class="card-body p-0">
             {% if my_active_posted_jobs %}
               <div class="list-group list-group-flush">
                 {% for pjob in my_active_posted_jobs %}
-                <div class="list-group-item p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+                <div class="list-group-item p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
                   <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
-                      <span class="fw-bold text-dark fs-6">{{ pjob.title }}</span>
-                      <span class="badge {% if pjob.status == 'Available' %}bg-success-subtle text-success{% else %}bg-info-subtle text-info{% endif %} border">{{ pjob.status }}</span>
+                      <span class="fw-bold text-dark fs-6 font-heading">{{ pjob.title }}</span>
+                      <span class="badge {% if pjob.status == 'Available' %}bg-success-subtle text-success{% else %}bg-info-subtle text-info{% endif %} border rounded-pill">{{ pjob.status }}</span>
                     </div>
                     <div class="small text-muted">
                       <i class="bi bi-geo-alt me-1 text-danger"></i>{{ pjob.location }} &bull; 
                       <i class="bi bi-calendar-event me-1"></i>{{ pjob.job_date }} &bull; 
-                      <strong>₹{{ "%.0f"|format(pjob.payment) }}</strong>/worker &bull; 
+                      <strong class="text-success font-heading">₹{{ "%.0f"|format(pjob.payment) }}</strong>/worker &bull; 
                       <span class="text-primary fw-semibold">{{ pjob.applicant_count }} applicant(s)</span>
                     </div>
                   </div>
                   <div class="d-flex gap-2">
-                    <a href="{{ url_for('job_routes.job_details', job_id=pjob.id) }}" class="btn btn-sm btn-outline-primary fw-bold">
-                      <i class="bi bi-person-lines-fill me-1"></i> Review Applicants
+                    <a href="{{ url_for('job_routes.job_details', job_id=pjob.id) }}" class="btn btn-sm btn-outline-primary fw-bold rounded-pill px-3">
+                      <i class="bi bi-person-lines-fill me-1"></i> Review Candidates
                     </a>
                   </div>
                 </div>
@@ -183,10 +187,12 @@
               </div>
             {% else %}
               <div class="p-5 text-center text-muted">
-                <i class="bi bi-folder-plus fs-1 d-block mb-2 text-primary opacity-50"></i>
-                <h6>No active job postings</h6>
-                <p class="small text-muted mb-3">Post a task in 60 seconds and connect with verified local workers.</p>
-                <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold">
+                <div class="stat-icon bg-primary-subtle text-primary mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                  <i class="bi bi-plus-circle"></i>
+                </div>
+                <h5 class="fw-bold font-heading text-dark">No Active Job Postings</h5>
+                <p class="small text-muted mb-3">Post your task in 60 seconds and match with verified local workers immediately.</p>
+                <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold rounded-pill px-4">
                   <i class="bi bi-plus-lg me-1"></i> Post Your First Job
                 </a>
               </div>
@@ -197,24 +203,27 @@
 
       <!-- Quick Actions Sidebar -->
       <div class="col-lg-4">
-        <div class="card card-custom p-4 mb-4 shadow-sm bg-light border-0">
-          <h6 class="fw-bold mb-3"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Employer Quick Actions</h6>
+        <div class="card card-custom p-4 mb-4 shadow-sm bg-white">
+          <h6 class="fw-bold mb-3 font-heading text-dark"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Quick Actions</h6>
           <div class="d-grid gap-2">
-            <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold text-start py-2">
-              <i class="bi bi-plus-circle me-2"></i> Create New Job Posting
+            <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold text-start py-2 rounded-3">
+              <i class="bi bi-plus-circle-fill me-2"></i> Create New Job Posting
             </a>
-            <a href="{{ url_for('message_routes.inbox') }}" class="btn btn-white bg-white border fw-semibold text-start py-2">
-              <i class="bi bi-chat-dots me-2 text-primary"></i> Chat &amp; Call Counterparties
+            <a href="{{ url_for('message_routes.inbox') }}" class="btn btn-light border fw-semibold text-start py-2 rounded-3 text-dark">
+              <i class="bi bi-chat-dots-fill me-2 text-primary"></i> Messages &amp; Contacts
             </a>
-            <a href="{{ url_for('wallet_routes.wallet') }}" class="btn btn-white bg-white border fw-semibold text-start py-2">
-              <i class="bi bi-wallet2 me-2 text-success"></i> Escrow &amp; Payments
+            <a href="{{ url_for('wallet_routes.wallet') }}" class="btn btn-light border fw-semibold text-start py-2 rounded-3 text-dark">
+              <i class="bi bi-wallet-fill me-2 text-success"></i> Escrow Vault &amp; Top Up
             </a>
           </div>
         </div>
 
-        <div class="card card-custom p-4 shadow-sm">
-          <h6 class="fw-bold mb-2"><i class="bi bi-shield-check text-success me-1"></i>Escrow Protection</h6>
-          <p class="small text-muted mb-0">
+        <div class="card card-custom p-4 shadow-sm border-0" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: white;">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-shield-check text-warning fs-4"></i>
+            <h6 class="fw-bold m-0 text-white font-heading">100% Escrow Protection</h6>
+          </div>
+          <p class="small text-light mb-0" style="opacity: 0.85; line-height: 1.6;">
             Funds deposited for job postings remain locked safely in QuickHire escrow until you verify the worker's work is completed.
           </p>
         </div>
@@ -227,25 +236,29 @@
     <!-- ========================================== -->
     
     <!-- Welcome Banner (Worker) -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 p-4 bg-white rounded-3 shadow-sm border border-success-subtle">
-      <div>
-        <div class="d-flex align-items-center gap-2">
-          <span class="badge bg-success px-2 py-1"><i class="bi bi-person-workspace me-1"></i> Worker Portal</span>
-          <h2 class="fw-extrabold m-0">Hi, {{ user.name }}</h2>
-          <span class="online-dot pulsing" title="Online Status: Active"></span>
+    <div class="card card-custom p-4 mb-4 shadow-sm border-success-subtle" style="background: linear-gradient(135deg, #ffffff 0%, #f6fbf8 100%);">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <span class="badge bg-success text-white px-3 py-1 rounded-pill fw-bold">
+              <i class="bi bi-person-workspace me-1"></i> Worker Portal
+            </span>
+            <span class="online-dot pulsing" title="Active Connection"></span>
+          </div>
+          <h2 class="fw-extrabold m-0 font-heading text-dark">Welcome back, {{ user.name }}</h2>
+          <p class="text-muted m-0 small mt-1">
+            <i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ user.location or 'Location not set' }} &bull; 
+            <span class="text-success fw-semibold">{{ user.skills or 'General Assistant' }}</span>
+          </p>
         </div>
-        <p class="text-muted m-0 small mt-1">
-          <i class="bi bi-geo-alt me-1 text-danger"></i>{{ user.location or 'Location not set' }} &bull; 
-          <span class="text-secondary">{{ user.skills or 'No skills listed' }}</span>
-        </p>
-      </div>
-      <div class="d-flex gap-2">
-        <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-success fw-bold shadow-sm d-flex align-items-center gap-1">
-          <i class="bi bi-search"></i> Find Gigs &amp; Work
-        </a>
-        <a href="{{ url_for('application_routes.applications') }}" class="btn btn-outline-success fw-bold">
-          <i class="bi bi-file-earmark-check me-1"></i> My Applications
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-success fw-bold shadow-sm rounded-pill px-4">
+            <i class="bi bi-search"></i> Find Gigs &amp; Work
+          </a>
+          <a href="{{ url_for('application_routes.applications') }}" class="btn btn-outline-success fw-bold rounded-pill px-3">
+            <i class="bi bi-file-earmark-check me-1"></i> My Applications
+          </a>
+        </div>
       </div>
     </div>
 
@@ -254,12 +267,12 @@
       <!-- Available Wallet -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-success-subtle text-success">
+          <div class="stat-icon bg-success-subtle text-success shadow-xs">
             <i class="bi bi-wallet2"></i>
           </div>
           <div>
-            <div class="text-muted small fw-semibold">My Earnings / Wallet</div>
-            <div class="fs-4 fw-bold text-success">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
+            <div class="text-muted small fw-semibold">My Earnings</div>
+            <div class="fs-4 fw-extrabold text-success font-heading">₹{{ "%.2f"|format(user.wallet_balance) }}</div>
           </div>
         </div>
       </div>
@@ -267,12 +280,12 @@
       <!-- Reliability Score -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-primary-subtle text-primary">
+          <div class="stat-icon bg-primary-subtle text-primary shadow-xs">
             <i class="bi bi-speedometer2"></i>
           </div>
           <div>
             <div class="text-muted small fw-semibold">Reliability Score</div>
-            <div class="fs-4 fw-bold text-primary">{{ user.reliability_score }}%</div>
+            <div class="fs-4 fw-extrabold text-primary font-heading">{{ user.reliability_score }}%</div>
           </div>
         </div>
       </div>
@@ -280,12 +293,12 @@
       <!-- Applications Sent -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-warning-subtle text-warning-emphasis">
-            <i class="bi bi-file-earmark-check"></i>
+          <div class="stat-icon bg-warning-subtle text-warning-emphasis shadow-xs">
+            <i class="bi bi-file-earmark-check-fill"></i>
           </div>
           <div>
-            <div class="text-muted small fw-semibold">My Applications</div>
-            <div class="fs-4 fw-bold text-warning-emphasis">{{ apps_count }}</div>
+            <div class="text-muted small fw-semibold">Applications</div>
+            <div class="fs-4 fw-extrabold text-warning-emphasis font-heading">{{ apps_count }}</div>
           </div>
         </div>
       </div>
@@ -293,16 +306,16 @@
       <!-- Rating -->
       <div class="col-6 col-md-3">
         <div class="stat-card">
-          <div class="stat-icon bg-info-subtle text-info">
-            <i class="bi bi-star"></i>
+          <div class="stat-icon bg-info-subtle text-info shadow-xs">
+            <i class="bi bi-star-fill"></i>
           </div>
           <div>
             <div class="text-muted small fw-semibold">Reputation</div>
-            <div class="fs-4 fw-bold text-dark">
+            <div class="fs-4 fw-extrabold text-dark font-heading">
               {% if user.rating %}
                 <span class="star-rating"><i class="bi bi-star-fill"></i> {{ "%.1f"|format(user.rating) }}</span>
               {% else %}
-                <span class="fs-6 text-muted">New User</span>
+                <span class="fs-6 text-muted">New Worker</span>
               {% endif %}
             </div>
           </div>
@@ -312,53 +325,53 @@
 
     <!-- Active Gigs (Clock In / Out) -->
     {% if active_worker_tasks %}
-    <div class="card card-custom border-success mb-4 shadow-sm">
-      <div class="card-header bg-success-subtle border-success d-flex justify-content-between align-items-center">
-        <h5 class="fw-bold m-0 text-success">
-          <i class="bi bi-tools me-2"></i> My Active Work Assignments
+    <div class="card card-custom border-success mb-4 shadow-sm" style="border-left: 5px solid #10b981;">
+      <div class="card-header bg-success-subtle border-success d-flex justify-content-between align-items-center py-3">
+        <h5 class="fw-bold m-0 text-success font-heading d-flex align-items-center gap-2">
+          <i class="bi bi-tools"></i> My Active Work Assignments
         </h5>
-        <span class="badge bg-success">{{ active_worker_tasks|length }} Active</span>
+        <span class="badge bg-success rounded-pill px-3 py-1">{{ active_worker_tasks|length }} Active Gigs</span>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
           <table class="table table-hover align-middle m-0">
-            <thead class="table-light small">
+            <thead class="table-light small text-muted">
               <tr>
-                <th>Job Title</th>
+                <th class="ps-4">Job Title</th>
                 <th>Employer</th>
                 <th>Schedule</th>
-                <th>Status</th>
-                <th>Payout</th>
-                <th>Action</th>
+                <th>Shift Status</th>
+                <th>Guaranteed Payout</th>
+                <th class="pe-4 text-end">Action</th>
               </tr>
             </thead>
             <tbody>
               {% for task in active_worker_tasks %}
               <tr>
-                <td class="fw-bold">
+                <td class="ps-4 fw-bold font-heading">
                   <a href="{{ url_for('job_routes.job_details', job_id=task.job_id) }}" class="text-decoration-none text-dark">
                     {{ task.job_title }}
                   </a>
                 </td>
-                <td>{{ task.poster_name }}</td>
+                <td class="fw-semibold text-dark">{{ task.poster_name }}</td>
                 <td>
-                  <div class="small">{{ task.job_date }}</div>
+                  <div class="small fw-semibold text-dark">{{ task.job_date }}</div>
                   <div class="text-muted small">{{ task.start_time }} - {{ task.end_time }}</div>
                 </td>
                 <td>
                   {% if task.status == 'Assigned' %}
-                    <span class="badge bg-info text-dark">Selected — Ready to Start</span>
+                    <span class="badge bg-info text-dark rounded-pill">Selected — Ready to Start</span>
                   {% elif task.status == 'In Progress' %}
-                    <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1 shadow-sm">
-                      <span class="online-dot pulsing bg-success" style="width: 7px; height: 7px;"></span> In Progress (Timer Running)
+                    <span class="badge bg-warning text-dark d-inline-flex align-items-center gap-1 rounded-pill px-3 py-1 shadow-xs">
+                      <span class="online-dot pulsing bg-success" style="width: 7px; height: 7px;"></span> In Progress
                     </span>
                   {% elif task.status == 'Awaiting Confirmation' %}
-                    <span class="badge bg-secondary">Awaiting Confirmation</span>
+                    <span class="badge bg-secondary text-white rounded-pill">Awaiting Confirmation</span>
                   {% endif %}
                 </td>
-                <td class="fw-bold text-success">₹{{ "%.0f"|format(task.job_payment) }}</td>
-                <td>
-                  <a href="{{ url_for('job_routes.job_details', job_id=task.job_id) }}" class="btn btn-sm btn-success fw-bold">
+                <td class="fw-extrabold text-success font-heading fs-6">₹{{ "%.0f"|format(task.job_payment) }}</td>
+                <td class="pe-4 text-end">
+                  <a href="{{ url_for('job_routes.job_details', job_id=task.job_id) }}" class="btn btn-sm btn-success fw-bold rounded-pill px-3 shadow-xs">
                     Open Gig &rarr;
                   </a>
                 </td>
@@ -373,31 +386,31 @@
 
     <!-- Browse Available Jobs Grid for Worker -->
     <div class="card card-custom shadow-sm mb-4">
-      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-        <h5 class="fw-bold m-0"><i class="bi bi-lightning text-warning me-2"></i>Available Gigs Near You</h5>
-        <a href="{{ url_for('job_routes.jobs') }}" class="small fw-semibold text-decoration-none text-success">Explore All Gigs &rarr;</a>
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3 border-bottom">
+        <h5 class="fw-bold m-0 font-heading text-dark"><i class="bi bi-lightning-charge-fill text-warning me-2"></i>Available Gigs Near You</h5>
+        <a href="{{ url_for('job_routes.jobs') }}" class="small fw-bold text-success text-decoration-none">Explore All Gigs &rarr;</a>
       </div>
       <div class="card-body p-0">
         {% if available_jobs %}
           <div class="list-group list-group-flush">
             {% for ajob in available_jobs %}
-            <div class="list-group-item p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+            <div class="list-group-item p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
               <div>
                 <div class="d-flex align-items-center gap-2 mb-1">
-                  {% if ajob.urgent %}<span class="badge bg-danger">URGENT</span>{% endif %}
-                  <span class="fw-bold text-dark fs-6">{{ ajob.title }}</span>
-                  <span class="badge bg-light text-muted border">{{ ajob.category }}</span>
+                  {% if ajob.urgent %}<span class="badge badge-urgent">URGENT</span>{% endif %}
+                  <span class="fw-bold text-dark fs-6 font-heading">{{ ajob.title }}</span>
+                  <span class="badge bg-light text-dark border rounded-pill">{{ ajob.category }}</span>
                 </div>
                 <div class="small text-muted">
-                  <i class="bi bi-geo-alt me-1 text-danger"></i>{{ ajob.location }} &bull; 
-                  <i class="bi bi-clock me-1"></i>{{ ajob.start_time }} - {{ ajob.end_time }} &bull; 
-                  Posted by <strong>{{ ajob.poster_name }}</strong>
+                  <i class="bi bi-geo-alt text-danger me-1"></i>{{ ajob.location }} &bull; 
+                  <i class="bi bi-clock text-primary me-1"></i>{{ ajob.start_time }} - {{ ajob.end_time }} &bull; 
+                  Client: <strong>{{ ajob.poster_name }}</strong>
                 </div>
               </div>
               <div class="d-flex align-items-center gap-3">
-                <span class="fs-5 fw-bold text-success">₹{{ "%.0f"|format(ajob.payment) }}</span>
-                <a href="{{ url_for('job_routes.job_details', job_id=ajob.id) }}" class="btn btn-sm btn-outline-success fw-bold">
-                  View &amp; Apply
+                <span class="fs-4 fw-extrabold text-success font-heading">₹{{ "%.0f"|format(ajob.payment) }}</span>
+                <a href="{{ url_for('job_routes.job_details', job_id=ajob.id) }}" class="btn btn-sm btn-outline-success fw-bold rounded-pill px-3">
+                  Apply Now &rarr;
                 </a>
               </div>
             </div>
@@ -405,8 +418,10 @@
           </div>
         {% else %}
           <div class="p-5 text-center text-muted">
-            <i class="bi bi-check-circle fs-1 d-block mb-2 text-success opacity-50"></i>
-            <h6>No open jobs at the moment</h6>
+            <div class="stat-icon bg-success-subtle text-success mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <h5 class="fw-bold font-heading text-dark">No open gigs right now</h5>
             <p class="small text-muted m-0">Check back shortly as new employer tasks are posted in real time.</p>
           </div>
         {% endif %}

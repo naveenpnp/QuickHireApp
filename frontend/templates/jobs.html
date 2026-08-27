@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Browse Jobs — QuickHire{% endblock %}
+{% block title %}Explore Local Gigs &amp; Work — QuickHire{% endblock %}
 
 {% block content %}
 <div class="container py-4">
@@ -8,23 +8,23 @@
   <!-- Page Header -->
   <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-      <h2 class="fw-extrabold m-0">Explore Local Jobs</h2>
-      <p class="text-muted small m-0">Find short-term gigs, same-day jobs, and part-time tasks</p>
+      <h2 class="fw-extrabold m-0 font-heading text-dark">Explore Local Gigs</h2>
+      <p class="text-muted small m-0">Find immediate same-day shifts, assistant tasks, and part-time gigs</p>
     </div>
     {% if current_user %}
-    <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold shadow-sm">
+    <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold shadow-sm rounded-pill px-4">
       <i class="bi bi-plus-lg me-1"></i> Post a Job
     </a>
     {% endif %}
   </div>
 
   <!-- Search & Filter Controls -->
-  <div class="card card-custom p-3 mb-4 shadow-sm">
+  <div class="card card-custom p-4 mb-4 shadow-sm bg-white">
     <form action="{{ url_for('job_routes.jobs') }}" method="GET" class="row g-3 align-items-center">
       <div class="col-md-5">
         <div class="input-group">
-          <span class="input-group-text bg-light"><i class="bi bi-search text-muted"></i></span>
-          <input type="text" name="search" class="form-control" placeholder="Search by title, description, or city..." value="{{ search or '' }}">
+          <span class="input-group-text bg-light ps-3"><i class="bi bi-search text-primary"></i></span>
+          <input type="text" name="search" class="form-control" placeholder="Search by title, skills, or city..." value="{{ search or '' }}">
         </div>
       </div>
 
@@ -40,26 +40,28 @@
       <div class="col-md-2">
         <div class="form-check form-switch pt-2">
           <input class="form-check-input" type="checkbox" id="urgentSwitch" name="urgent" value="1" {% if urgent_only %}checked{% endif %}>
-          <label class="form-check-label small fw-bold text-danger" for="urgentSwitch">Urgent Only</label>
+          <label class="form-check-label small fw-bold text-danger" for="urgentSwitch">
+            <i class="bi bi-fire me-1"></i> Urgent Only
+          </label>
         </div>
       </div>
 
       <div class="col-md-2 d-flex gap-2">
-        <button type="submit" class="btn btn-primary w-100 fw-bold">Filter</button>
+        <button type="submit" class="btn btn-primary w-100 fw-bold rounded-pill">Filter</button>
         {% if search or selected_category or urgent_only %}
-          <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-secondary" title="Clear Filters"><i class="bi bi-x-lg"></i></a>
+          <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-light border rounded-pill px-3" title="Clear Filters"><i class="bi bi-x-lg"></i></a>
         {% endif %}
       </div>
     </form>
   </div>
 
-  <!-- Categories Horizontal Badges -->
+  <!-- Categories Horizontal Pill Badges -->
   <div class="d-flex gap-2 overflow-auto pb-3 mb-4 text-nowrap">
-    <a href="{{ url_for('job_routes.jobs', search=search, urgent='1' if urgent_only else '') }}" class="btn btn-sm {% if not selected_category %}btn-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">
-      All
+    <a href="{{ url_for('job_routes.jobs', search=search, urgent='1' if urgent_only else '') }}" class="btn btn-sm {% if not selected_category %}btn-dark text-white{% else %}btn-light border text-dark{% endif %} rounded-pill px-3 fw-semibold">
+      All Gigs
     </a>
     {% for cat in categories %}
-    <a href="{{ url_for('job_routes.jobs', category=cat.name, search=search, urgent='1' if urgent_only else '') }}" class="btn btn-sm {% if selected_category == cat.name %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">
+    <a href="{{ url_for('job_routes.jobs', category=cat.name, search=search, urgent='1' if urgent_only else '') }}" class="btn btn-sm {% if selected_category == cat.name %}btn-primary text-white{% else %}btn-light border text-dark{% endif %} rounded-pill px-3 fw-semibold">
       <i class="bi {{ cat.icon }} me-1"></i>{{ cat.name }}
     </a>
     {% endfor %}
@@ -70,58 +72,60 @@
     <div class="row g-4">
       {% for job in jobs %}
       <div class="col-md-6 col-lg-4">
-        <div class="card card-custom card-interactive h-100 d-flex flex-column {% if job.urgent %}border-danger-subtle{% endif %}">
-          <div class="card-body d-flex flex-column">
+        <div class="card card-custom card-interactive h-100 d-flex flex-column {% if job.urgent %}border-danger-subtle shadow-sm{% endif %}" {% if job.urgent %}style="border-top: 4px solid #ef4444;"{% endif %}>
+          <div class="card-body d-flex flex-column p-4">
             
             <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ job.category }}</span>
+              <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
+                {{ job.category }}
+              </span>
               <div class="d-flex gap-1 align-items-center">
                 {% if job.urgent %}
-                  <span class="badge bg-danger-subtle text-danger border border-danger-subtle fw-bold">URGENT</span>
+                  <span class="badge badge-urgent small">URGENT</span>
                 {% endif %}
-                <span class="badge bg-light text-dark border">{{ job.status }}</span>
+                <span class="badge bg-light text-dark border rounded-pill small">{{ job.status }}</span>
               </div>
             </div>
 
-            <h5 class="card-title fw-bold mb-1">
+            <h5 class="card-title fw-bold mb-2 font-heading">
               <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="text-dark text-decoration-none">
                 {{ job.title }}
               </a>
             </h5>
 
             <div class="text-muted small mb-2">
-              <i class="bi bi-geo-alt me-1 text-danger"></i>{{ job.location }} &bull; 
-              <i class="bi bi-calendar-event me-1"></i>{{ job.job_date }}
+              <span class="me-2"><i class="bi bi-geo-alt text-danger me-1"></i>{{ job.location }}</span>
+              <span><i class="bi bi-calendar-event text-muted me-1"></i>{{ job.job_date }}</span>
             </div>
 
             <div class="small text-secondary mb-3">
-              <i class="bi bi-clock me-1"></i>{{ job.start_time }} - {{ job.end_time }}
+              <i class="bi bi-clock text-primary me-1"></i>{{ job.start_time }} - {{ job.end_time }}
             </div>
 
-            <p class="card-text text-muted small flex-grow-1">
+            <p class="card-text text-muted small flex-grow-1" style="line-height: 1.6;">
               {{ job.description[:110] }}{% if job.description|length > 110 %}...{% endif %}
             </p>
 
-            <div class="p-2 bg-light rounded-3 d-flex justify-content-between align-items-center mb-3">
+            <div class="p-3 bg-light rounded-4 d-flex justify-content-between align-items-center mb-3">
               <div>
-                <span class="text-muted small d-block" style="font-size: 11px;">Pay per Worker</span>
-                <span class="fs-5 fw-bold text-success">₹{{ "%.0f"|format(job.payment) }}</span>
+                <span class="text-muted small d-block" style="font-size: 11px; text-transform: uppercase;">Guaranteed Payout</span>
+                <span class="fs-4 fw-extrabold text-success font-heading">₹{{ "%.0f"|format(job.payment) }}</span>
               </div>
               <div class="text-end">
-                <span class="text-muted small d-block" style="font-size: 11px;">Slots</span>
-                <span class="fw-semibold small"><i class="bi bi-people me-1"></i>{{ job.required_workers }} needed</span>
+                <span class="text-muted small d-block" style="font-size: 11px; text-transform: uppercase;">Slots Needed</span>
+                <span class="fw-bold small text-dark"><i class="bi bi-people-fill text-primary me-1"></i>{{ job.required_workers }} helper(s)</span>
               </div>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-              <div class="d-flex align-items-center gap-1 small">
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+              <div class="d-flex align-items-center gap-2 small">
                 <span class="online-dot {% if not job.poster_is_online %}offline{% endif %}"></span>
-                <span class="text-muted">{{ job.poster_name }}</span>
+                <span class="text-dark fw-semibold">{{ job.poster_name }}</span>
                 {% if job.poster_rating %}
                   <span class="star-rating ms-1" style="font-size: 11px;"><i class="bi bi-star-fill"></i> {{ "%.1f"|format(job.poster_rating) }}</span>
                 {% endif %}
               </div>
-              <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-sm btn-primary fw-bold">
+              <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-sm btn-primary fw-bold rounded-pill px-3">
                 View &amp; Apply
               </a>
             </div>
@@ -133,11 +137,13 @@
     </div>
   {% else %}
     <div class="card card-custom p-5 text-center shadow-sm">
-      <i class="bi bi-search fs-1 text-muted mb-3"></i>
-      <h4 class="fw-bold">No jobs matched your search</h4>
-      <p class="text-muted small mb-4">Try clearing filters or checking other categories</p>
+      <div class="stat-icon bg-light text-muted mx-auto mb-3" style="width: 60px; height: 60px;">
+        <i class="bi bi-search fs-2"></i>
+      </div>
+      <h4 class="fw-bold font-heading text-dark">No gigs matched your search</h4>
+      <p class="text-muted small mb-4">Try clearing your filters or selecting a different category.</p>
       <div>
-        <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-primary">Reset Filters</a>
+        <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-primary rounded-pill px-4">Reset All Filters</a>
       </div>
     </div>
   {% endif %}
