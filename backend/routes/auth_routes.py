@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from models import UserModel
-from services.auth_service import login_user, logout_user, hash_password, verify_password, validate_strong_password
+from services.auth_service import login_user, logout_user, hash_password, verify_password, validate_strong_password, login_required
 
 auth_bp = Blueprint('auth_routes', __name__)
 
@@ -73,8 +73,8 @@ def login():
             flash("Invalid email or password. Please check your credentials.", "danger")
             return render_template('login.html', email=email, active_tab=portal_role)
 
-        # Login strictly with the user's permanent registered account role
-        user_role = user.get('role') or 'worker'
+        # Sign into the selected portal role (employer or worker), honoring dual-role capability
+        user_role = portal_role if portal_role in ('employer', 'worker') else (user.get('role') or 'worker')
         login_user(user, selected_role=user_role)
         role_label = "Employer Portal" if user_role == 'employer' else "Worker Portal"
         flash(f"Welcome back, {user['name']}! Signed into {role_label}.", "success")
@@ -91,6 +91,50 @@ def logout():
     logout_user()
     flash("You have been logged out successfully.", "info")
     return redirect(url_for('main_routes.index'))
+
+@auth_bp.route('/switch-role')
+@login_required
+def switch_role():
+    target = request.args.get('to')
+    current_role = session.get('role', 'worker')
+    if target in ('employer', 'worker'):
+        new_role = target
+    else:
+        new_role = 'worker' if current_role == 'employer' else 'employer'
+    session['role'] = new_role
+    user_id = session.get('user_id')
+    if user_id:
+        try:
+            from models import db_cursor
+            with db_cursor(commit=True) as cur:
+                cur.execute("UPDATE users SET role = ? WHERE id = ?", (new_role, user_id))
+        except Exception:
+            pass
+    role_label = "Employer Mode (Post Jobs & Hire)" if new_role == 'employer' else "Worker Mode (Find Gigs & Earn)"
+    flash(f"Switched to {role_label}!", "success")
+    next_url = request.args.get('next') or request.referrer
+    if next_url and ('/login' not in next_url and '/register' not in next_url):
+        return redirect(next_url)
+    return redirect(url_for('main_routes.dashboard'))
+
+@auth_bp.route('/demo-login/<role>')
+def demo_login(role):
+    role = role.lower().strip()
+    if role == 'employer':
+        email = "arun@gmail.com"
+    else:
+        email = "rahul@gmail.com"
+        role = 'worker'
+
+    user = UserModel.get_by_email(email)
+    if not user:
+        flash(f"Demo account {email} not found.", "warning")
+        return redirect(url_for('auth_routes.login'))
+
+    login_user(user, selected_role=role)
+    portal_name = "Employer Portal" if role == 'employer' else "Worker Portal"
+    flash(f"Signed in as demo user {user['name']} ({portal_name}) with ₹{user['wallet_balance']:,.0f} balance.", "success")
+    return redirect(url_for('main_routes.dashboard'))
 
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():

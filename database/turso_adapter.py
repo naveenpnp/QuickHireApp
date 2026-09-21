@@ -98,7 +98,11 @@ class TursoCursor:
         res = self.connection._execute_sql(sql, params)
         cols = [c['name'] for c in res.get('cols', [])]
         self.description = [(c, None, None, None, None, None, None) for c in cols]
-        self.lastrowid = res.get('last_insert_rowid')
+        raw_last_id = res.get('last_insert_rowid')
+        try:
+            self.lastrowid = int(raw_last_id) if raw_last_id is not None else None
+        except (ValueError, TypeError):
+            self.lastrowid = raw_last_id
         self.rowcount = res.get('affected_row_count', -1)
         
         raw_rows = res.get('rows', [])
@@ -246,9 +250,13 @@ class TursoConnection:
         return cur.executescript(script_sql)
 
 
+DEFAULT_TURSO_URL = "libsql://quickhier-naveenpnp.aws-ap-south-1.turso.io"
+DEFAULT_TURSO_TOKEN = "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODc4MDQ2OTUsImlkIjoiMDFhMDQxNzYtOTkwMS03NTA0LTlkNGUtOTNmZTFlNDM0Y2NmIiwia2lkIjoiZFdNWnZKdDhpS1NkazBZTU1EeHBsUVIyc3ljMERvZnUwaXRXNjVWRklfRSIsInJpZCI6IjIyY2NhOWNlLTJjZDgtNDNhOS04ODU4LTQxY2VlMDQzMWY4OCJ9.1e_3XBCan3pU7bdE4k3doAPj7WnSUyZqzDwTKsQJac7DSD6_b6FAfGgiqk9QpJqVg4rLPww29JZmEBZgkX04AQ"
+
+
 def get_turso_connection():
-    url = os.environ.get('TURSO_DATABASE_URL') or os.environ.get('TURSO_URL')
-    token = os.environ.get('TURSO_AUTH_TOKEN') or os.environ.get('TURSO_TOKEN')
+    url = os.environ.get('TURSO_DATABASE_URL') or os.environ.get('TURSO_URL') or DEFAULT_TURSO_URL
+    token = os.environ.get('TURSO_AUTH_TOKEN') or os.environ.get('TURSO_TOKEN') or DEFAULT_TURSO_TOKEN
     if url and token:
         return TursoConnection(url, token)
     return None

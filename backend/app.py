@@ -60,7 +60,7 @@ def create_app():
     @app.context_processor
     def inject_global_context():
         current_user = get_current_user()
-        current_role = current_user.get('role', 'worker') if current_user else 'worker'
+        current_role = session.get('role') or (current_user.get('role') if current_user else 'worker') or 'worker'
         categories = []
         active_live_gig = None
         awaiting_confirmation_gig = None

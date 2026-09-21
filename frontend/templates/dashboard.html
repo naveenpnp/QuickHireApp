@@ -26,7 +26,10 @@
             Manage active job postings, hire helpers, and release escrow payouts.
           </p>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <a href="{{ url_for('auth_routes.switch_role', to='worker') }}" class="btn btn-outline-success fw-bold rounded-pill px-3 shadow-xs" title="Switch to Worker Portal to browse and apply for gigs">
+            <i class="bi bi-arrow-repeat me-1"></i> Switch to Worker Mode
+          </a>
           <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary fw-bold shadow-sm rounded-pill px-4">
             <i class="bi bi-plus-lg"></i> Post New Job
           </a>
@@ -251,7 +254,10 @@
             <span class="text-success fw-semibold">{{ user.skills or 'General Assistant' }}</span>
           </p>
         </div>
-        <div class="d-flex gap-2 flex-wrap">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+          <a href="{{ url_for('auth_routes.switch_role', to='employer') }}" class="btn btn-outline-primary fw-bold rounded-pill px-3 shadow-xs" title="Switch to Employer Portal to post jobs and hire helpers">
+            <i class="bi bi-arrow-repeat me-1"></i> Switch to Employer Mode
+          </a>
           <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-success fw-bold shadow-sm rounded-pill px-4">
             <i class="bi bi-search"></i> Find Gigs &amp; Work
           </a>
