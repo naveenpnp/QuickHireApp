@@ -117,25 +117,6 @@ def switch_role():
         return redirect(next_url)
     return redirect(url_for('main_routes.dashboard'))
 
-@auth_bp.route('/demo-login/<role>')
-def demo_login(role):
-    role = role.lower().strip()
-    if role == 'employer':
-        email = "arun@gmail.com"
-    else:
-        email = "rahul@gmail.com"
-        role = 'worker'
-
-    user = UserModel.get_by_email(email)
-    if not user:
-        flash(f"Demo account {email} not found.", "warning")
-        return redirect(url_for('auth_routes.login'))
-
-    login_user(user, selected_role=role)
-    portal_name = "Employer Portal" if role == 'employer' else "Worker Portal"
-    flash(f"Signed in as demo user {user['name']} ({portal_name}) with ₹{user['wallet_balance']:,.0f} balance.", "success")
-    return redirect(url_for('main_routes.dashboard'))
-
 @auth_bp.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
