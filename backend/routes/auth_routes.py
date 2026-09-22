@@ -174,58 +174,64 @@ def forgot_password():
 @auth_bp.route('/auth/google', methods=['GET', 'POST'])
 def google_auth():
     """Real-World Google OAuth Sign-In & Profile Linking"""
-    role = request.args.get('role', 'worker').lower()
+    try:
+        role = request.args.get('role', 'worker').lower()
+        if role not in ('employer', 'worker'):
+            role = 'worker'
 
-    if request.method == 'POST':
-        email = request.form.get('google_email', '').strip().lower()
-        name = request.form.get('google_name', '').strip()
+        if request.method == 'POST':
+            email = request.form.get('google_email', '').strip().lower()
+            name = request.form.get('google_name', '').strip()
 
-        if not email:
-            flash("Please provide your Google email address.", "danger")
-            return render_template('google_auth.html', role=role)
+            if not email:
+                flash("Please provide your Google email address.", "danger")
+                return render_template('google_auth.html', role=role)
 
-        user = UserModel.get_by_email(email)
-        if not user:
-            # Create real account from Google Profile
-            pwd_hash = hash_password("GoogleAuth@2026")
-            display_name = name if name else email.split('@')[0].replace('.', ' ').title()
-            user_id = UserModel.create(
-                name=display_name,
-                email=email,
-                password_hash=pwd_hash,
-                location="Chennai, Tamil Nadu",
-                skills="Google Verified Account",
-                phone="+91 98401 55555",
-                role=role
-            )
-            user = UserModel.get_by_id(user_id)
+            user = UserModel.get_by_email(email)
+            if not user:
+                # Create real account from Google Profile
+                pwd_hash = hash_password("GoogleAuth@2026")
+                display_name = name if name else email.split('@')[0].replace('.', ' ').title()
+                user_id = UserModel.create(
+                    name=display_name,
+                    email=email,
+                    password_hash=pwd_hash,
+                    location="Chennai, Tamil Nadu",
+                    skills="Google Verified Account",
+                    phone="+91 98401 55555",
+                    role=role
+                )
+                user = UserModel.get_by_id(user_id)
 
-        user_role = user.get('role') or role
-        login_user(user, selected_role=user_role)
-        flash(f"Successfully authenticated via Google as {user['name']} ({user['email']})!", "success")
-        return redirect(url_for('main_routes.dashboard'))
+            user_role = user.get('role') or role
+            login_user(user, selected_role=user_role)
+            flash(f"Successfully authenticated via Google as {user['name']} ({user['email']})!", "success")
+            return redirect(url_for('main_routes.dashboard'))
 
-    email_param = request.args.get('email')
-    if email_param:
-        email = email_param.strip().lower()
-        name = request.args.get('name', '').strip()
-        user = UserModel.get_by_email(email)
-        if not user:
-            pwd_hash = hash_password("GoogleAuth@2026")
-            display_name = name if name else email.split('@')[0].replace('.', ' ').title()
-            user_id = UserModel.create(
-                name=display_name,
-                email=email,
-                password_hash=pwd_hash,
-                location="Chennai, Tamil Nadu",
-                skills="Google Verified Account",
-                phone="+91 98401 55555",
-                role=role
-            )
-            user = UserModel.get_by_id(user_id)
-        user_role = user.get('role') or role
-        login_user(user, selected_role=user_role)
-        flash(f"Successfully authenticated via Google as {user['name']} ({user['email']})!", "success")
-        return redirect(url_for('main_routes.dashboard'))
+        email_param = request.args.get('email')
+        if email_param:
+            email = email_param.strip().lower()
+            name = request.args.get('name', '').strip()
+            user = UserModel.get_by_email(email)
+            if not user:
+                pwd_hash = hash_password("GoogleAuth@2026")
+                display_name = name if name else email.split('@')[0].replace('.', ' ').title()
+                user_id = UserModel.create(
+                    name=display_name,
+                    email=email,
+                    password_hash=pwd_hash,
+                    location="Chennai, Tamil Nadu",
+                    skills="Google Verified Account",
+                    phone="+91 98401 55555",
+                    role=role
+                )
+                user = UserModel.get_by_id(user_id)
+            user_role = user.get('role') or role
+            login_user(user, selected_role=user_role)
+            flash(f"Successfully authenticated via Google as {user['name']} ({user['email']})!", "success")
+            return redirect(url_for('main_routes.dashboard'))
 
-    return render_template('google_auth.html', role=role)
+        return render_template('google_auth.html', role=role)
+    except Exception as e:
+        flash(f"Notice: {str(e)}. You can also log in directly via 1-Click Test Login or Email/Password.", "warning")
+        return redirect(url_for('auth_routes.login', role=request.args.get('role', 'worker')))

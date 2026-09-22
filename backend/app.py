@@ -37,6 +37,19 @@ def create_app():
         static_folder=os.path.join(PROJECT_ROOT, 'frontend', 'static'),
         static_url_path='/static'
     )
+    
+    import jinja2
+    candidate_template_dirs = [
+        os.path.join(PROJECT_ROOT, 'frontend', 'templates'),
+        os.path.abspath('frontend/templates'),
+        os.path.join(BACKEND_DIR, '..', 'frontend', 'templates'),
+        os.path.join(os.getcwd(), 'frontend', 'templates'),
+        '/var/task/frontend/templates'
+    ]
+    loaders = [jinja2.FileSystemLoader(d) for d in candidate_template_dirs if os.path.isdir(d)]
+    if loaders:
+        app.jinja_loader = jinja2.ChoiceLoader(loaders)
+
     app.secret_key = os.environ.get('SECRET_KEY', 'quickhire-super-secret-key-2026')
 
     # Explicit static route for Vercel Serverless
@@ -92,7 +105,9 @@ def create_app():
     def internal_server_error(e):
         import traceback
         traceback.print_exc()
-        return render_template('error.html', error_code=500, error_message="An internal server error occurred while processing your request. Please try again shortly."), 500
+        orig = getattr(e, 'original_exception', e)
+        err_msg = f"{type(orig).__name__}: {str(orig)}" if orig else "Internal Server Error"
+        return render_template('error.html', error_code=500, error_message=f"An unexpected error occurred ({err_msg}). Please try returning to the dashboard or login."), 500
 
     return app
 

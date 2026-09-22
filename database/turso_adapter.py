@@ -200,7 +200,7 @@ class TursoConnection:
         }
 
         req_data = json.dumps(payload).encode('utf-8')
-        max_retries = 3
+        max_retries = 2
         last_err = None
 
         for attempt in range(max_retries):
@@ -211,7 +211,7 @@ class TursoConnection:
                 method='POST'
             )
             try:
-                with urllib.request.urlopen(req, timeout=20) as resp:
+                with urllib.request.urlopen(req, timeout=6) as resp:
                     data = json.loads(resp.read().decode('utf-8'))
                     results = data.get('results', [])
                     if not results:
