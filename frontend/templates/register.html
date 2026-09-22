@@ -325,7 +325,8 @@
 
   // Initial tag render on page load
   document.addEventListener('DOMContentLoaded', function() {
-    const isEmployer = document.getElementById('role_employer').checked;
+    const roleEmployerEl = document.getElementById('role_employer');
+    const isEmployer = roleEmployerEl ? roleEmployerEl.checked : false;
     updateRoleForm(isEmployer ? 'employer' : 'worker');
   });
 </script>

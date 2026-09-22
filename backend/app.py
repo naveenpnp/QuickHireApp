@@ -86,11 +86,13 @@ def create_app():
     # Error handlers
     @app.errorhandler(404)
     def page_not_found(e):
-        return render_template('base.html', error_message="Page Not Found (404)"), 404
+        return render_template('error.html', error_code=404, error_message="The page or portal route you requested could not be found."), 404
 
     @app.errorhandler(500)
     def internal_server_error(e):
-        return render_template('base.html', error_message="Internal Server Error (500)"), 500
+        import traceback
+        traceback.print_exc()
+        return render_template('error.html', error_code=500, error_message="An internal server error occurred while processing your request. Please try again shortly."), 500
 
     return app
 

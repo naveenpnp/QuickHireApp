@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}{{ error_code or 'Notice' }} — QuickHire{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-md-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8 text-center">
+      <div class="card card-custom p-5 shadow-lg bg-white border-0">
+        
+        <div class="stat-icon bg-danger-subtle text-danger mx-auto mb-4" style="width: 72px; height: 72px; font-size: 2rem;">
+          <i class="bi {% if error_code == 404 %}bi-compass{% else %}bi-exclamation-octagon-fill{% endif %}"></i>
+        </div>
+
+        <h1 class="display-5 fw-extrabold text-dark font-heading mb-2">
+          {{ error_code or 'Oops!' }}
+        </h1>
+        
+        <h4 class="fw-bold text-dark font-heading mb-3">
+          {% if error_code == 404 %}
+            Page Not Found
+          {% elif error_code == 500 %}
+            Internal Server Error
+          {% else %}
+            Something Went Wrong
+          {% endif %}
+        </h4>
+
+        <p class="text-muted mb-4" style="line-height: 1.6;">
+          {{ error_message or "We could not complete your request. Please try returning to the dashboard or contact support if the issue persists." }}
+        </p>
+
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+          {% if session.get('user_id') %}
+            <a href="{{ url_for('main_routes.dashboard') }}" class="btn btn-primary fw-bold px-4 py-2 rounded-pill shadow-sm font-heading">
+              <i class="bi bi-speedometer2 me-1"></i> Go to Dashboard
+            </a>
+          {% else %}
+            <a href="{{ url_for('main_routes.index') }}" class="btn btn-primary fw-bold px-4 py-2 rounded-pill shadow-sm font-heading">
+              <i class="bi bi-house-door-fill me-1"></i> Return Home
+            </a>
+            <a href="{{ url_for('auth_routes.login') }}" class="btn btn-outline-primary fw-bold px-4 py-2 rounded-pill font-heading">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Log In
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

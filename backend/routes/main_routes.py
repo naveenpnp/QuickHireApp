@@ -89,3 +89,21 @@ def dashboard():
         my_active_posted_jobs=my_active_posted_jobs,
         available_jobs=available_jobs
     )
+
+@main_bp.route('/employer')
+@main_bp.route('/job-poster')
+@main_bp.route('/poster')
+def employer_portal():
+    if 'user_id' in session:
+        session['role'] = 'employer'
+        return redirect(url_for('main_routes.dashboard'))
+    return redirect(url_for('auth_routes.login', role='employer'))
+
+@main_bp.route('/worker')
+@main_bp.route('/job-seeker')
+def worker_portal():
+    if 'user_id' in session:
+        session['role'] = 'worker'
+        return redirect(url_for('main_routes.dashboard'))
+    return redirect(url_for('auth_routes.login', role='worker'))
+

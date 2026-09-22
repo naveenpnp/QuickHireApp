@@ -52,5 +52,40 @@ class RouteVerificationTest(unittest.TestCase):
                 res = self.client.get(route)
                 self.assertEqual(res.status_code, 200, f"Authenticated route {route} returned status {res.status_code}")
 
+    def test_portal_routes_unauthenticated(self):
+        client = self.app.test_client()
+        # Unauthenticated /employer redirects to login with role=employer
+        res = client.get('/employer')
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/login', res.headers.get('Location', ''))
+        self.assertIn('role=employer', res.headers.get('Location', ''))
+
+        # Unauthenticated /worker redirects to login with role=worker
+        res = client.get('/worker')
+        self.assertEqual(res.status_code, 302)
+        self.assertIn('/login', res.headers.get('Location', ''))
+        self.assertIn('role=worker', res.headers.get('Location', ''))
+
+    def test_demo_login_and_portals(self):
+        client = self.app.test_client()
+        # Test demo login for employer
+        res = client.get('/demo-login/employer', follow_redirects=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'Employer Portal', res.data)
+        self.assertIn(b'Post New Job', res.data)
+
+        # Test demo login for worker
+        res = client.get('/demo-login/worker', follow_redirects=True)
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'Worker Portal', res.data)
+        self.assertIn(b'Find Gigs', res.data)
+
+    def test_error_page_404(self):
+        client = self.app.test_client()
+        res = client.get('/non-existent-page-12345')
+        self.assertEqual(res.status_code, 404)
+        self.assertIn(b'404', res.data)
+        self.assertIn(b'Page Not Found', res.data)
+
 if __name__ == '__main__':
     unittest.main()

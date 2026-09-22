@@ -595,8 +595,23 @@
                 <i class="bi bi-grid-fill me-1 text-primary"></i> Browse Jobs
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link text-primary fw-semibold" href="{{ url_for('main_routes.employer_portal') }}">
+                <i class="bi bi-building me-1"></i> For Employers
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-success fw-semibold" href="{{ url_for('main_routes.worker_portal') }}">
+                <i class="bi bi-person-workspace me-1"></i> For Workers
+              </a>
+            </li>
           {% elif current_role == 'employer' %}
-            <!-- EMPLOYER NAV LINKS -->
+            <!-- EMPLOYER / JOB POSTER NAV LINKS -->
+            <li class="nav-item">
+              <a class="nav-link fw-bold text-dark" href="{{ url_for('main_routes.employer_portal') }}">
+                <i class="bi bi-building-fill me-1 text-primary"></i> Job Poster Hub
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link text-primary fw-bold" href="{{ url_for('job_routes.post_job') }}">
                 <i class="bi bi-plus-circle-fill me-1"></i> Post a Job
@@ -619,6 +634,11 @@
             </li>
           {% else %}
             <!-- WORKER NAV LINKS -->
+            <li class="nav-item">
+              <a class="nav-link fw-bold text-dark" href="{{ url_for('main_routes.worker_portal') }}">
+                <i class="bi bi-person-workspace me-1 text-success"></i> Worker Hub
+              </a>
+            </li>
             <li class="nav-item">
               <a class="nav-link text-success fw-bold" href="{{ url_for('job_routes.jobs') }}">
                 <i class="bi bi-search me-1"></i> Find Gigs &amp; Work
@@ -701,10 +721,10 @@
             </div>
           {% else %}
             <!-- Unauthenticated Top Nav Options -->
-            <a href="{{ url_for('auth_routes.login', role='employer') }}" class="btn btn-sm btn-outline-primary px-3 fw-bold rounded-pill">
+            <a href="{{ url_for('main_routes.employer_portal') }}" class="btn btn-sm btn-outline-primary px-3 fw-bold rounded-pill">
               <i class="bi bi-building me-1"></i> Employer Portal
             </a>
-            <a href="{{ url_for('auth_routes.login', role='worker') }}" class="btn btn-sm btn-outline-success px-3 fw-bold rounded-pill">
+            <a href="{{ url_for('main_routes.worker_portal') }}" class="btn btn-sm btn-outline-success px-3 fw-bold rounded-pill">
               <i class="bi bi-person-workspace me-1"></i> Worker Portal
             </a>
             <a href="{{ url_for('auth_routes.register') }}" class="btn btn-sm btn-primary px-3 fw-bold rounded-pill shadow-sm">

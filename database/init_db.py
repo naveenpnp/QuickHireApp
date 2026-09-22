@@ -111,8 +111,12 @@ def init_db(force=False):
             """)
             conn.commit()
 
-        print("Database already initialized. Ensuring categories and demo users exist...")
-        seed_database(conn)
+        cursor.execute("SELECT count(*) FROM users")
+        u_count = cursor.fetchone()[0]
+        if u_count == 0:
+            print("Ensuring categories and demo users exist...")
+            seed_database(conn)
+
 
     conn.close()
     print(f"QuickHire database ready at: {DB_PATH}")
