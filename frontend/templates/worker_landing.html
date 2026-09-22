@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}QuickHire for Workers — Find Local Gigs &amp; Get Paid Same-Day{% endblock %}
+
+{% block content %}
+<!-- Emerald Aurora Hero Section (Worker Focus) -->
+<section class="hero-section text-center position-relative py-5" style="background: linear-gradient(135deg, #06261f 0%, #064e3b 45%, #0f172a 100%) !important;">
+  <div class="container py-3 py-md-4 position-relative" style="z-index: 2;">
+    <div class="hero-badge mx-auto mb-3" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(52, 211, 153, 0.35);">
+      <span class="online-dot pulsing"></span>
+      <span>Guaranteed Escrow Payouts &bull; ₹0 Platform Fee &bull; Live Shifts Open Today</span>
+    </div>
+    
+    <h1 class="display-3 fw-extrabold mb-3 text-white font-heading" style="font-size: clamp(2.2rem, 5.5vw, 3.8rem); line-height: 1.15;">
+      Turn Free Hours Into<br>
+      <span class="text-gradient-success" style="background: linear-gradient(135deg, #34d399 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        Instant Cash Today.
+      </span>
+    </h1>
+    
+    <p class="lead text-light mx-auto mb-4 px-2" style="max-width: 680px; opacity: 0.92; font-size: clamp(1rem, 2.2vw, 1.25rem);">
+      Browse flexible local gigs in your neighborhood, apply with 1 click, clock in on our live stopwatch, and get paid straight to your wallet as soon as the shift ends.
+    </p>
+
+    <!-- Worker Action CTA Buttons -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap mb-4">
+      <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-success btn-lg fw-bold px-4 py-3 shadow-lg rounded-pill font-heading">
+        <i class="bi bi-search me-2 fs-5"></i> Browse Open Gigs
+      </a>
+      <a href="{{ url_for('auth_routes.register', role='worker') }}" class="btn btn-warning text-dark btn-lg fw-bold px-4 py-3 shadow-lg rounded-pill font-heading">
+        <i class="bi bi-person-check-fill me-2 fs-5"></i> Start Earning / Register
+      </a>
+      <a href="{{ url_for('auth_routes.login', role='worker') }}" class="btn btn-outline-light btn-lg fw-bold px-4 py-3 rounded-pill font-heading">
+        <i class="bi bi-box-arrow-in-right me-2 fs-5"></i> Worker Sign In
+      </a>
+    </div>
+
+    <!-- Worker Trust Stats Strip -->
+    <div class="row g-3 justify-content-center mt-3 text-start mx-auto" style="max-width: 860px;">
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-warning">₹0</div>
+          <div class="small text-light opacity-75">Registration Cost</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-success">Same-Day</div>
+          <div class="small text-light opacity-75">Wallet Payouts</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-info">100%</div>
+          <div class="small text-light opacity-75">Hours Guaranteed</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-white">98.4%</div>
+          <div class="small text-light opacity-75">On-Time Pay Rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Live Open Shifts Feed (Immediate Value for Workers) -->
+<div class="container py-5">
+  
+  <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div>
+      <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold small mb-1">
+        <span class="online-dot pulsing"></span> LIVE SHIFT FEED
+      </span>
+      <h3 class="fw-extrabold font-heading text-dark m-0">Open Gigs Ready for You Today</h3>
+    </div>
+    <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-success fw-bold rounded-pill px-3">
+      View All Available Gigs &rarr;
+    </a>
+  </div>
+
+  {% if available_jobs %}
+  <div class="row g-4 mb-5">
+    {% for job in available_jobs[:6] %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card card-custom card-interactive h-100 p-4 shadow-sm bg-white d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="badge bg-light text-dark border px-3 py-1 rounded-pill small fw-bold">
+            <i class="bi bi-tag-fill text-success me-1"></i> {{ job.category }}
+          </span>
+          {% if job.is_urgent %}
+            <span class="badge badge-urgent small">
+              <i class="bi bi-lightning-fill"></i> Urgent
+            </span>
+          {% endif %}
+        </div>
+
+        <h5 class="fw-bold font-heading text-dark mb-1">{{ job.title }}</h5>
+        <p class="text-muted small mb-3 flex-grow-1" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+          {{ job.description }}
+        </p>
+
+        <div class="p-3 bg-light rounded-3 mb-3">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <span class="small text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Location</span>
+            <span class="small fw-semibold text-dark">{{ job.location }}</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="small text-muted"><i class="bi bi-cash-stack text-success me-1"></i> Payment</span>
+            <span class="fw-bold text-success font-heading fs-6">₹{{ "%.0f"|format(job.payment) }}</span>
+          </div>
+        </div>
+
+        <a href="{{ url_for('job_routes.job_details', job_id=job.id) }}" class="btn btn-outline-success w-100 fw-bold rounded-pill shadow-xs">
+          View &amp; Apply &rarr;
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card card-custom p-4 text-center mb-5 bg-light border-0">
+    <p class="text-muted m-0">No open gigs at this moment. Check back shortly!</p>
+  </div>
+  {% endif %}
+
+  <!-- Why Workers Choose QuickHire -->
+  <div class="text-center mb-5">
+    <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-bold fs-6 mb-2">
+      <i class="bi bi-stars me-1"></i> WHY WORKERS CHOOSE QUICKHIRE
+    </span>
+    <h2 class="display-6 fw-extrabold font-heading text-dark">Never Chase a Late Payout Again</h2>
+    <p class="text-muted mx-auto" style="max-width: 620px;">Built from the ground up to protect your time, guarantee your wages, and help you build a professional reputation.</p>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <!-- Worker Benefit 1: Escrow Protection -->
+    <div class="col-md-4">
+      <div class="card card-custom h-100 p-4 border-success-subtle shadow-sm">
+        <div class="stat-icon bg-success-subtle text-success mb-3" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="bi bi-wallet2"></i>
+        </div>
+        <h4 class="fw-bold font-heading text-dark">100% Escrow Backed</h4>
+        <p class="text-muted">Employers deposit the shift payment into our escrow vault before you even start work. You never have to worry about whether you'll get paid.</p>
+        <div class="mt-auto">
+          <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+            <i class="bi bi-shield-check text-success me-1"></i> Funds pre-locked in vault
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker Benefit 2: Live Stopwatch -->
+    <div class="col-md-4">
+      <div class="card card-custom h-100 p-4 border-info-subtle shadow-sm">
+        <div class="stat-icon bg-info-subtle text-info-emphasis mb-3" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="bi bi-stopwatch-fill"></i>
+        </div>
+        <h4 class="fw-bold font-heading text-dark">Shift Stopwatch</h4>
+        <p class="text-muted">Clock in on your phone with live timestamp proof. Every minute you work is accurately recorded, and approved overtime is automatically compensated.</p>
+        <div class="mt-auto">
+          <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+            <i class="bi bi-clock-history text-info me-1"></i> Real-time overtime tracking
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Worker Benefit 3: Public Reliability Score -->
+    <div class="col-md-4">
+      <div class="card card-custom h-100 p-4 border-warning-subtle shadow-sm">
+        <div class="stat-icon bg-warning-subtle text-warning-emphasis mb-3" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="bi bi-trophy-fill"></i>
+        </div>
+        <h4 class="fw-bold font-heading text-dark">Reliability Score Engine</h4>
+        <p class="text-muted">Every on-time completion boosts your public Reliability Score. Top-rated workers get prioritized for high-paying VIP gigs and instant hiring.</p>
+        <div class="mt-auto">
+          <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+            <i class="bi bi-star-fill text-warning me-1"></i> Higher score = More earnings
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Steps for Workers -->
+  <div class="card card-custom p-4 p-md-5 mb-5 bg-light border-0 shadow-xs">
+    <div class="text-center mb-5">
+      <span class="badge bg-dark text-white px-3 py-2 rounded-pill fw-bold small mb-2">HOW IT WORKS</span>
+      <h3 class="fw-extrabold font-heading text-dark">Start Working in 3 Simple Steps</h3>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="rounded-circle bg-success text-white mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 800;">1</div>
+        <h5 class="fw-bold font-heading text-dark">Find Gigs &amp; Apply</h5>
+        <p class="text-muted small">Search open gigs by category or location. Tap "Apply" to submit your profile directly to the employer.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="rounded-circle bg-info text-white mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 800;">2</div>
+        <h5 class="fw-bold font-heading text-dark">Clock In &amp; Work</h5>
+        <p class="text-muted small">Show up at the venue and press "Clock In". Our live timer records your exact shift duration without hassle.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="rounded-circle bg-primary text-white mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 800;">3</div>
+        <h5 class="fw-bold font-heading text-dark">Get Paid Instantly</h5>
+        <p class="text-muted small">Shift complete! Once confirmed, money is credited instantly to your wallet. Request payout to your bank or UPI anytime.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom CTA Card for Workers -->
+  <div class="card card-custom p-4 p-md-5 text-center text-white border-0 shadow-lg position-relative overflow-hidden" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 45%, #0f766e 100%);">
+    <div class="position-relative" style="z-index: 2;">
+      <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2 fw-semibold mb-3">
+        <i class="bi bi-wallet2 text-warning me-1"></i> START YOUR FIRST SHIFT TODAY
+      </span>
+      <h2 class="display-6 fw-extrabold font-heading text-white mb-3">Join QuickHire &amp; Earn on Your Schedule</h2>
+      <p class="text-light opacity-90 mx-auto mb-4" style="max-width: 580px;">
+        Zero registration fees. 100% verified gigs. Choose when and where you want to work.
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('auth_routes.register', role='worker') }}" class="btn btn-warning text-dark btn-lg fw-bold rounded-pill px-4 py-3 shadow">
+          <i class="bi bi-person-plus-fill me-1"></i> Create Worker Account
+        </a>
+        <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-light btn-lg fw-bold rounded-pill px-4 py-3">
+          Browse Open Gigs
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

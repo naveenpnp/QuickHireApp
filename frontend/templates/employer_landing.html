@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block title %}QuickHire for Employers — Hire Verified Local Workers in Minutes{% endblock %}
+
+{% block content %}
+<!-- Cosmic Aurora Hero Section (Employer Focus) -->
+<section class="hero-section text-center position-relative py-5">
+  <div class="container py-3 py-md-4 position-relative" style="z-index: 2;">
+    <div class="hero-badge mx-auto mb-3">
+      <i class="bi bi-shield-check text-success"></i>
+      <span>100% Escrow Protection &bull; Pre-Screened Local Talent &bull; Live Work Stopwatch</span>
+    </div>
+    
+    <h1 class="display-3 fw-extrabold mb-3 text-white font-heading" style="font-size: clamp(2.2rem, 5.5vw, 3.8rem); line-height: 1.15;">
+      Hire Reliable Local Workers<br>
+      <span class="text-gradient-primary" style="background: linear-gradient(135deg, #818cf8 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        In Under 5 Minutes.
+      </span>
+    </h1>
+    
+    <p class="lead text-light mx-auto mb-4 px-2" style="max-width: 680px; opacity: 0.92; font-size: clamp(1rem, 2.2vw, 1.25rem);">
+      From event crews and store assistants to data entry and delivery drivers. Post your gig in 60 seconds, review verified applicants, and only release payment when work is confirmed.
+    </p>
+
+    <!-- Employer Action CTA Buttons -->
+    <div class="d-flex justify-content-center gap-3 flex-wrap mb-4">
+      <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-primary btn-lg fw-bold px-4 py-3 shadow-lg rounded-pill font-heading">
+        <i class="bi bi-plus-circle-fill me-2 fs-5"></i> Post a Job Now
+      </a>
+      <a href="{{ url_for('auth_routes.register', role='employer') }}" class="btn btn-warning text-dark btn-lg fw-bold px-4 py-3 shadow-lg rounded-pill font-heading">
+        <i class="bi bi-building-check me-2 fs-5"></i> Create Employer Account
+      </a>
+      <a href="{{ url_for('auth_routes.login', role='employer') }}" class="btn btn-outline-light btn-lg fw-bold px-4 py-3 rounded-pill font-heading">
+        <i class="bi bi-box-arrow-in-right me-2 fs-5"></i> Employer Sign In
+      </a>
+    </div>
+
+    <!-- Trust Stats Strip -->
+    <div class="row g-3 justify-content-center mt-3 text-start mx-auto" style="max-width: 860px;">
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-info">1,200+</div>
+          <div class="small text-light opacity-75">Verified Helpers</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-success">100%</div>
+          <div class="small text-light opacity-75">Escrow Secured</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-warning">&lt; 4 Mins</div>
+          <div class="small text-light opacity-75">Avg Match Time</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="p-3 rounded-4 bg-white bg-opacity-10 border border-white border-opacity-15 text-center text-white backdrop-blur">
+          <div class="fs-4 fw-extrabold font-heading text-danger">Zero</div>
+          <div class="small text-light opacity-75">No-Show Risk</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Value Pillars for Employers -->
+<div class="container py-5">
+  
+  <div class="text-center mb-5">
+    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-bold fs-6 mb-2">
+      <i class="bi bi-gear-wide-connected me-1"></i> WHY EMPLOYERS LOVE QUICKHIRE
+    </span>
+    <h2 class="display-6 fw-extrabold font-heading text-dark">Built to Eliminate Hiring Friction</h2>
+    <p class="text-muted mx-auto" style="max-width: 620px;">Everything you need to hire, monitor, and compensate temporary staff without paperwork or guesswork.</p>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <!-- Pillar 1: Escrow Vault -->
+    <div class="col-md-4">
+      <div class="card card-custom h-100 p-4 border-primary-subtle shadow-sm">
+        <div class="stat-icon bg-primary-subtle text-primary mb-3" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="bi bi-shield-lock-fill"></i>
+        </div>
+        <h4 class="fw-bold font-heading text-dark">100% Escrow Vault</h4>
+        <p class="text-muted">Your funds remain safely locked in our automated escrow vault. Money is only released to the worker once you confirm the job was successfully completed.</p>
+        <div class="mt-auto">
+          <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+            <i class="bi bi-check-circle-fill text-success me-1"></i> No upfront payment to strangers
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pillar 2: Live Attendance & Stopwatch -->
+    <div class="col-md-4">
+      <div class="card card-custom h-100 p-4 border-info-subtle shadow-sm">
+        <div class="stat-icon bg-info-subtle text-info-emphasis mb-3" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="bi bi-stopwatch-fill"></i>
+        </div>
+        <h4 class="fw-bold font-heading text-dark">Live Work Stopwatch</h4>
+        <p class="text-muted">Workers clock in live via GPS/timestamp. If a worker arrives 20 minutes late, the final payment is automatically prorated to the exact minute. Zero disputes.</p>
+        <div class="mt-auto">
+          <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+            <i class="bi bi-check-circle-fill text-success me-1"></i> Automated late proration
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pillar 3: Verified Reliability Ratings -->
+    <div class="col-md-4">
+      <div class="card card-custom h-100 p-4 border-success-subtle shadow-sm">
+        <div class="stat-icon bg-success-subtle text-success mb-3" style="width: 56px; height: 56px; font-size: 1.6rem;">
+          <i class="bi bi-patch-check-fill"></i>
+        </div>
+        <h4 class="fw-bold font-heading text-dark">Verified Reliability Score</h4>
+        <p class="text-muted">Every worker profile features an unalterable Reliability Score based on on-time arrival history, completed shifts, and past employer ratings.</p>
+        <div class="mt-auto">
+          <span class="badge bg-light text-dark border px-3 py-2 rounded-pill small">
+            <i class="bi bi-check-circle-fill text-success me-1"></i> Transparent reviews & badges
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3-Step Workflow for Employers -->
+  <div class="card card-custom p-4 p-md-5 mb-5 bg-light border-0 shadow-xs">
+    <div class="text-center mb-5">
+      <span class="badge bg-dark text-white px-3 py-2 rounded-pill fw-bold small mb-2">SIMPLE 3-STEP PROCESS</span>
+      <h3 class="fw-extrabold font-heading text-dark">How QuickHire Works for Employers</h3>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="rounded-circle bg-primary text-white mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 800;">1</div>
+        <h5 class="fw-bold font-heading text-dark">Post Your Shift</h5>
+        <p class="text-muted small">Specify role, shift start/end time, location, and total wage. Funds are placed into escrow to guarantee seriousness.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="rounded-circle bg-info text-white mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 800;">2</div>
+        <h5 class="fw-bold font-heading text-dark">Review &amp; Select</h5>
+        <p class="text-muted small">Receive instant applications from nearby workers. Compare reliability scores and past employer ratings, then accept with 1 click.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="rounded-circle bg-success text-white mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: 800;">3</div>
+        <h5 class="fw-bold font-heading text-dark">Track &amp; Pay</h5>
+        <p class="text-muted small">The worker clocks in on arrival. When the shift finishes, inspect the work and click "Release Escrow" to settle instantly.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- What Can You Hire For? -->
+  <div class="mb-5">
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+      <div>
+        <h3 class="fw-bold font-heading text-dark m-0">Popular Roles Hired Daily</h3>
+        <p class="text-muted small m-0">Pre-screened assistants available across 10+ categories</p>
+      </div>
+      <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-sm btn-outline-primary rounded-pill fw-bold px-3">
+        + Post in Any Category
+      </a>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-6 col-md-3">
+        <div class="card card-custom p-3 text-center border-0 shadow-xs h-100">
+          <i class="bi bi-calendar-event-fill text-primary fs-2 mb-2"></i>
+          <h6 class="fw-bold m-0 font-heading text-dark">Event &amp; Catering</h6>
+          <small class="text-muted">Servers, ushers, setup crews</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card card-custom p-3 text-center border-0 shadow-xs h-100">
+          <i class="bi bi-truck-flatbed text-info fs-2 mb-2"></i>
+          <h6 class="fw-bold m-0 font-heading text-dark">Delivery &amp; Logistics</h6>
+          <small class="text-muted">Couriers, movers, drivers</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card card-custom p-3 text-center border-0 shadow-xs h-100">
+          <i class="bi bi-shop text-warning fs-2 mb-2"></i>
+          <h6 class="fw-bold m-0 font-heading text-dark">Retail &amp; Shop Help</h6>
+          <small class="text-muted">Cashiers, stockers, greeters</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card card-custom p-3 text-center border-0 shadow-xs h-100">
+          <i class="bi bi-laptop-fill text-success fs-2 mb-2"></i>
+          <h6 class="fw-bold m-0 font-heading text-dark">Data Entry &amp; Office</h6>
+          <small class="text-muted">Filing, digitizing, assistants</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom CTA Card -->
+  <div class="card card-custom p-4 p-md-5 text-center text-white border-0 shadow-lg position-relative overflow-hidden" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #4f46e5 100%);">
+    <div class="position-relative" style="z-index: 2;">
+      <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2 fw-semibold mb-3">
+        <i class="bi bi-lightning-charge-fill text-warning me-1"></i> READY TO SOLVE YOUR STAFFING SHORTAGE?
+      </span>
+      <h2 class="display-6 fw-extrabold font-heading text-white mb-3">Post Your First Shift in Under 60 Seconds</h2>
+      <p class="text-light opacity-90 mx-auto mb-4" style="max-width: 580px;">
+        Join hundreds of businesses, event managers, and shops finding reliable helpers with guaranteed escrow security.
+      </p>
+      <div class="d-flex justify-content-center gap-3 flex-wrap">
+        <a href="{{ url_for('job_routes.post_job') }}" class="btn btn-warning text-dark btn-lg fw-bold rounded-pill px-4 py-3 shadow">
+          <i class="bi bi-plus-circle-fill me-1"></i> Post a Job Now
+        </a>
+        <a href="{{ url_for('auth_routes.register', role='employer') }}" class="btn btn-outline-light btn-lg fw-bold rounded-pill px-4 py-3">
+          Create Employer Account
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

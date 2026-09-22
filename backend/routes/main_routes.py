@@ -7,7 +7,10 @@ main_bp = Blueprint('main_routes', __name__)
 @main_bp.route('/')
 def index():
     if 'user_id' in session:
-        return redirect(url_for('main_routes.dashboard'))
+        role = session.get('role', 'employer')
+        if role == 'worker':
+            return redirect(url_for('main_routes.worker_portal'))
+        return redirect(url_for('main_routes.employer_portal'))
     
     # Fetch recent urgent and available jobs for public hero display
     urgent_jobs = JobModel.get_all(urgent_only=True, status='Available')[:3]
@@ -97,7 +100,17 @@ def employer_portal():
     if 'user_id' in session:
         session['role'] = 'employer'
         return redirect(url_for('main_routes.dashboard'))
-    return redirect(url_for('auth_routes.login', role='employer'))
+    
+    # Unauthenticated Employer Landing Page
+    with db_cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM users WHERE role = 'worker'")
+        worker_count = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM jobs WHERE status = 'Completed'")
+        completed_jobs_count = cur.fetchone()[0]
+
+    return render_template('employer_landing.html',
+                           worker_count=worker_count or 1200,
+                           completed_jobs_count=completed_jobs_count or 450)
 
 @main_bp.route('/worker')
 @main_bp.route('/job-seeker')
@@ -105,5 +118,21 @@ def worker_portal():
     if 'user_id' in session:
         session['role'] = 'worker'
         return redirect(url_for('main_routes.dashboard'))
-    return redirect(url_for('auth_routes.login', role='worker'))
+    
+    # Unauthenticated Worker Landing Page
+    available_jobs = JobModel.get_all(status='Available')[:6]
+    urgent_jobs = JobModel.get_all(urgent_only=True, status='Available')[:3]
+    
+    with db_cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM users")
+        total_users = cur.fetchone()[0]
+        cur.execute("SELECT SUM(payment) FROM jobs WHERE status = 'Completed'")
+        row = cur.fetchone()
+        total_earnings = row[0] if row and row[0] else 150000
+
+    return render_template('worker_landing.html',
+                           available_jobs=available_jobs,
+                           urgent_jobs=urgent_jobs,
+                           total_users=total_users,
+                           total_earnings=total_earnings)
 

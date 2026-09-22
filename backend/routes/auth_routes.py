@@ -48,14 +48,18 @@ def register():
         login_user(user, selected_role=role)
         role_title = "Employer / Client" if role == 'employer' else "Worker / Freelancer"
         flash(f"Welcome to QuickHire, {name}! Your {role_title} account has been created with ₹5,000 initial balance.", "success")
-        return redirect(url_for('main_routes.dashboard'))
+        if role == 'worker':
+            return redirect(url_for('main_routes.worker_portal'))
+        return redirect(url_for('main_routes.employer_portal'))
 
     return render_template('register.html', selected_role=selected_role)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if 'user_id' in session:
-        return redirect(url_for('main_routes.dashboard'))
+        if session.get('role') == 'worker':
+            return redirect(url_for('main_routes.worker_portal'))
+        return redirect(url_for('main_routes.employer_portal'))
 
     active_tab = request.args.get('role', 'employer')
 
@@ -73,7 +77,7 @@ def login():
             flash("Invalid email or password. Please check your credentials.", "danger")
             return render_template('login.html', email=email, active_tab=portal_role)
 
-        # Sign into the selected portal role (employer or worker), honoring dual-role capability
+        # Sign into the selected portal role (employer or worker)
         user_role = portal_role if portal_role in ('employer', 'worker') else (user.get('role') or 'worker')
         login_user(user, selected_role=user_role)
         role_label = "Employer Portal" if user_role == 'employer' else "Worker Portal"
@@ -82,7 +86,9 @@ def login():
         next_url = request.args.get('next')
         if next_url and next_url.startswith('/'):
             return redirect(next_url)
-        return redirect(url_for('main_routes.dashboard'))
+        if user_role == 'worker':
+            return redirect(url_for('main_routes.worker_portal'))
+        return redirect(url_for('main_routes.employer_portal'))
 
     return render_template('login.html', active_tab=active_tab)
 
@@ -186,7 +192,9 @@ def google_auth():
             user_role = user.get('role') or role
             login_user(user, selected_role=user_role)
             flash(f"Successfully authenticated via Google as {user['name']} ({user['email']})!", "success")
-            return redirect(url_for('main_routes.dashboard'))
+            if user_role == 'worker':
+                return redirect(url_for('main_routes.worker_portal'))
+            return redirect(url_for('main_routes.employer_portal'))
 
         email_param = request.args.get('email')
         if email_param:
@@ -209,9 +217,11 @@ def google_auth():
             user_role = user.get('role') or role
             login_user(user, selected_role=user_role)
             flash(f"Successfully authenticated via Google as {user['name']} ({user['email']})!", "success")
-            return redirect(url_for('main_routes.dashboard'))
+            if user_role == 'worker':
+                return redirect(url_for('main_routes.worker_portal'))
+            return redirect(url_for('main_routes.employer_portal'))
 
         return render_template('google_auth.html', role=role)
     except Exception as e:
-        flash(f"Notice: {str(e)}. You can also log in directly via 1-Click Test Login or Email/Password.", "warning")
+        flash(f"Notice: {str(e)}. You can also log in directly with your Email and Password.", "warning")
         return redirect(url_for('auth_routes.login', role=request.args.get('role', 'worker')))

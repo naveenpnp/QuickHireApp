@@ -54,17 +54,17 @@ class RouteVerificationTest(unittest.TestCase):
 
     def test_portal_routes_unauthenticated(self):
         client = self.app.test_client()
-        # Unauthenticated /employer redirects to login with role=employer
+        # Unauthenticated /employer renders dedicated Employer Landing Page
         res = client.get('/employer')
-        self.assertEqual(res.status_code, 302)
-        self.assertIn('/login', res.headers.get('Location', ''))
-        self.assertIn('role=employer', res.headers.get('Location', ''))
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'Hire Reliable Local Workers', res.data)
+        self.assertIn(b'Post a Job Now', res.data)
 
-        # Unauthenticated /worker redirects to login with role=worker
+        # Unauthenticated /worker renders dedicated Worker Landing Page
         res = client.get('/worker')
-        self.assertEqual(res.status_code, 302)
-        self.assertIn('/login', res.headers.get('Location', ''))
-        self.assertIn('role=worker', res.headers.get('Location', ''))
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'Turn Free Hours Into', res.data)
+        self.assertIn(b'Browse Open Gigs', res.data)
 
     def test_real_login_and_portals(self):
         client = self.app.test_client()
@@ -77,6 +77,9 @@ class RouteVerificationTest(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIn(b'Employer Portal', res.data)
         self.assertIn(b'Post New Job', res.data)
+        # Ensure switch mode buttons are completely absent
+        self.assertNotIn(b'Switch to Worker Mode', res.data)
+        self.assertNotIn(b'Switch to Employer Mode', res.data)
 
 
     def test_error_page_404(self):

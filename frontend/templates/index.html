@@ -39,10 +39,10 @@
 
     <!-- Quick Action Portals -->
     <div class="d-flex justify-content-center gap-3 flex-wrap">
-      <a href="{{ url_for('auth_routes.login', role='employer') }}" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
+      <a href="{{ url_for('main_routes.employer_portal') }}" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
         <i class="bi bi-building-fill me-1"></i> Employer Portal &rarr;
       </a>
-      <a href="{{ url_for('auth_routes.login', role='worker') }}" class="btn btn-success fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
+      <a href="{{ url_for('main_routes.worker_portal') }}" class="btn btn-success fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
         <i class="bi bi-person-workspace me-1"></i> Worker Portal &rarr;
       </a>
       <a href="{{ url_for('job_routes.jobs') }}" class="btn btn-outline-light fw-bold px-4 py-2 rounded-pill font-heading">
