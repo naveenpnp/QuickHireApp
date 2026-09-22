@@ -66,19 +66,18 @@ class RouteVerificationTest(unittest.TestCase):
         self.assertIn('/login', res.headers.get('Location', ''))
         self.assertIn('role=worker', res.headers.get('Location', ''))
 
-    def test_demo_login_and_portals(self):
+    def test_real_login_and_portals(self):
         client = self.app.test_client()
-        # Test demo login for employer
-        res = client.get('/demo-login/employer', follow_redirects=True)
+        # Test real email/password login as employer
+        res = client.post('/login', data={
+            'email': 'arun@gmail.com',
+            'password': '123456',
+            'role': 'employer'
+        }, follow_redirects=True)
         self.assertEqual(res.status_code, 200)
         self.assertIn(b'Employer Portal', res.data)
         self.assertIn(b'Post New Job', res.data)
 
-        # Test demo login for worker
-        res = client.get('/demo-login/worker', follow_redirects=True)
-        self.assertEqual(res.status_code, 200)
-        self.assertIn(b'Worker Portal', res.data)
-        self.assertIn(b'Find Gigs', res.data)
 
     def test_error_page_404(self):
         client = self.app.test_client()

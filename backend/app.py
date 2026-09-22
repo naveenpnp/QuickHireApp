@@ -50,7 +50,11 @@ def create_app():
     if loaders:
         app.jinja_loader = jinja2.ChoiceLoader(loaders)
 
-    app.secret_key = os.environ.get('SECRET_KEY', 'quickhire-super-secret-key-2026')
+    raw_secret = os.environ.get('SECRET_KEY', '')
+    if not raw_secret or not str(raw_secret).strip():
+        raw_secret = 'quickhire-production-secret-key-2026-vault-auth-99x7'
+    app.secret_key = str(raw_secret).strip()
+    app.config['SECRET_KEY'] = str(raw_secret).strip()
 
     # Explicit static route for Vercel Serverless
     @app.route('/static/<path:filename>')
