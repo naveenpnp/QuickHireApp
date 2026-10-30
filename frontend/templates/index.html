@@ -24,12 +24,12 @@
 
     <!-- Floating Glass Search Bar -->
     <div class="hero-search-box mx-auto mb-4" style="max-width: 720px;">
-      <form action="{{ url_for('job_routes.jobs') }}" method="GET" class="d-flex flex-column flex-md-row align-items-center gap-2">
+      <form action="{{ url_for('job_routes.jobs') }}" method="GET" class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
         <div class="input-group flex-grow-1">
           <span class="input-group-text bg-transparent border-0 ps-3">
             <i class="bi bi-search text-primary fs-5"></i>
           </span>
-          <input type="text" name="search" class="form-control" placeholder="Search gigs, skills, or city (e.g. Event, Data Entry, Trichy, Chennai)">
+          <input type="text" name="search" class="form-control" placeholder="Search gigs, skills, or city (e.g. Event, Data Entry, Trichy)">
         </div>
         <button type="submit" class="btn btn-primary px-4 py-2 w-100 w-md-auto fw-bold rounded-pill font-heading">
           <i class="bi bi-arrow-right-circle-fill me-1"></i> Search Gigs
@@ -38,7 +38,7 @@
     </div>
 
     <!-- Quick Action Portals -->
-    <div class="d-flex justify-content-center gap-3 flex-wrap">
+    <div class="hero-cta-group d-flex justify-content-center gap-2 gap-md-3 flex-wrap">
       <a href="{{ url_for('main_routes.employer_portal') }}" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow-sm rounded-pill font-heading">
         <i class="bi bi-building-fill me-1"></i> Employer Portal &rarr;
       </a>
@@ -56,8 +56,8 @@
 <div class="container py-4 py-md-5">
   
   <!-- Category Quick Filters (Horizontal Pill Carousel) -->
-  <div class="mb-5 text-center">
-    <div class="d-flex gap-2 justify-content-start justify-content-md-center flex-nowrap flex-md-wrap overflow-auto pb-2 text-nowrap px-1">
+  <div class="mb-4 mb-md-5 text-center">
+    <div class="category-pills-slider d-flex gap-2 justify-content-start justify-content-md-center flex-nowrap flex-md-wrap overflow-auto pb-2 text-nowrap px-1">
       <a href="{{ url_for('job_routes.jobs') }}" class="badge bg-white text-dark border px-3 py-2 text-decoration-none shadow-xs rounded-pill fs-6 fw-bold">
         <i class="bi bi-stars text-warning me-1"></i> All Categories
       </a>

@@ -8,7 +8,7 @@
     <div class="col-lg-5 col-md-7">
 
       <!-- Portal Switcher Nav Tabs -->
-      <div class="d-flex p-1 bg-white border rounded-pill shadow-xs mb-4">
+      <div class="portal-switcher-pills d-flex p-1 bg-white border rounded-pill shadow-xs mb-4">
         <a href="{{ url_for('auth_routes.login', role='employer') }}" class="btn flex-fill py-2 fw-bold text-center rounded-pill {% if active_tab == 'employer' %}btn-primary text-white shadow-sm{% else %}btn-light text-muted{% endif %}">
           <i class="bi bi-building me-1"></i> Employer Portal
         </a>
@@ -19,7 +19,7 @@
 
       {% if active_tab == 'employer' %}
         <!-- ================= EMPLOYER LOGIN PORTAL ================= -->
-        <div class="card card-custom p-4 p-md-5 shadow-lg border-primary-subtle bg-white">
+        <div class="card card-custom p-3 p-sm-4 p-md-5 shadow-lg border-primary-subtle bg-white">
           
           <!-- Portal Header -->
           <div class="text-center mb-4">
@@ -94,7 +94,7 @@
 
       {% else %}
         <!-- ================= WORKER LOGIN PORTAL ================= -->
-        <div class="card card-custom p-4 p-md-5 shadow-lg border-success-subtle bg-white">
+        <div class="card card-custom p-3 p-sm-4 p-md-5 shadow-lg border-success-subtle bg-white">
           
           <!-- Portal Header -->
           <div class="text-center mb-4">
